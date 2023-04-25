@@ -1,0 +1,3 @@
+[submodule "packages/react-native-http-bridge-refurbished"]
+	path = packages/react-native-http-bridge-refurbished
+	url = https://TomSwift@github.com/TomSwift/react-native-http-bridge-refurbished.git

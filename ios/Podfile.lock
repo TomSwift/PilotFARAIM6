@@ -350,7 +350,7 @@ PODS:
   - React-jsinspector (0.71.7)
   - React-logger (0.71.7):
     - glog
-  - react-native-http-bridge-refurbished (1.2.5):
+  - react-native-http-bridge-refurbished (0.0.1):
     - GCDWebServer
     - React
   - react-native-quick-sqlite (8.0.2):
@@ -694,7 +694,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: eaa5f71eb8f6861cf0e57f1a0f52aeb020d9e18e
   React-jsinspector: 9885f6f94d231b95a739ef7bb50536fb87ce7539
   React-logger: 3f8ebad1be1bf3299d1ab6d7f971802d7395c7ef
-  react-native-http-bridge-refurbished: 3868b86a50e7af5c4e9a31d7fb914816a052b606
+  react-native-http-bridge-refurbished: e905f7a34dfecae8d457fea538434e5ff18c0d8d
   react-native-quick-sqlite: 2b225dadc63b670f027111e58f6f169773f6d755
   react-native-safe-area-context: f5549f36508b1b7497434baa0cd97d7e470920d4
   react-native-webview: 203b6a1c7507737f777c91d7e10c30e7e67c1a17
@@ -717,6 +717,6 @@ SPEC CHECKSUMS:
   Yoga: d56980c8914db0b51692f55533409e844b66133c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 0bc7a01275dac48c81425dc1e60961b191611cbd
+PODFILE CHECKSUM: 615d456d25cb2616c6dcf35ddfb8983167065904
 
 COCOAPODS: 1.11.3
