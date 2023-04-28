@@ -67,5 +67,15 @@ target 'PilotFARAIM6' do
       :mac_catalyst_enabled => false
     )
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
-  end
+ 
+    # turn on SQLITE FTS3
+    installer.pods_project.targets.each do |target|
+      if target.name == "react-native-quick-sqlite" then
+        target.build_configurations.each do |config|
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'SQLITE_ENABLE_FTS3', 'SQLITE_ENABLE_FTS3_PARENTHESIS', 'SQLITE_ENABLE_MEMORY_MANAGEMENT']
+        end
+      end
+    end
+ 
+  end 
 end

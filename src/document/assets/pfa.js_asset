@@ -1,0 +1,194 @@
+
+var applier;
+
+function hideClass(objClass)
+{
+    var elements = document.getElementsByClassName(objClass);
+    for (i=0; i<elements.length; i++)
+    {
+        elements[i].style.display="none"
+    }
+}
+
+function showClass(objClass)
+{
+    var elements = document.getElementsByClassName(objClass);
+    for (i=0; i<elements.length; i++)
+    {
+        if ( elements[i].tagName == 'span' )
+        {
+            elements[i].style.display="inline";
+        }
+        else
+        {
+            elements[i].style.display="block";
+        }
+    }
+}
+
+function show_changes()
+{
+    hideClass( 'changes-none' );
+    showClass( 'changes-deleted' );
+    showClass( 'changes-added' );
+}
+
+function hide_changes()
+{
+    showClass( 'changes-none' );
+    hideClass( 'changes-deleted' );
+    hideClass( 'changes-added' );
+}
+
+function changes_count()
+{
+    var count = document.getElementsByClassName('changes-deleted').length;
+    count += document.getElementsByClassName('changes-added').length;
+    return count;
+}
+
+function highlight_init() 
+{
+	rangy.init();
+	
+	applier = rangy.createCssClassApplier('user-highlight', true);
+}
+
+function can_highlight_selection() 
+{
+    var sel = rangy.getSelection();
+	var range = sel.getRangeAt(0);
+	var nodes = range.getNodes();
+	var nr = rangy.createRange();
+	for (i = 0; i < nodes.length; i++) {
+		nr.selectNode(nodes[i]);
+		if (!applier.isAppliedToRange(nr)) {
+			return "true";
+		}
+	}
+	return "false";
+}
+
+function can_unhighlight_selection() {
+	
+    var sel = rangy.getSelection();
+	var range = sel.getRangeAt(0);
+	var nodes = range.getNodes();
+	var nr = rangy.createRange();
+	for (i = 0; i < nodes.length; i++) {
+		nr.selectNode(nodes[i]);
+		if (applier.isAppliedToRange(nr)) {
+			return "true";
+		}
+	}
+	return "false";
+}
+
+function highlight_selection() 
+{
+	applier.applyToSelection();
+}
+
+function unhighlight_selection() 
+{
+	var sel = rangy.getSelection();
+	
+	range = sel.getRangeAt(0);
+	
+	if (!applier.isAppliedToRange(range)) {
+		
+		applier.applyToRange(range);
+	}
+	
+	applier.undoToRange(range);
+	
+	sel.removeAllRanges();
+}  
+
+function save_highlights() 
+{
+	var highlights = [];
+	var content_layer = document.getElementById( "content-layer" );
+	var elements = document.getElementsByClassName("user-highlight");
+	for ( i = 0 ; i < elements.length ; i++ ) {
+		var span = elements[i];
+		var r = rangy.createRange();
+		r.selectNode(span);
+		
+		applier.undoToRange(r);
+		
+		var serialized = rangy.serializeRange(r, false, content_layer);
+		
+		highlights.push(serialized);
+		
+		applier.applyToRange(r);
+	}
+	
+	return JSON.stringify(highlights);
+}
+
+function restore_highlights( stringified_highlights ) 
+{
+	var highlights = JSON.parse(stringified_highlights);
+	
+	var content_layer = document.getElementById( "content-layer" );
+
+	for (i = 0; i < highlights.length; i++) {
+		
+		var serialized = highlights[i];
+		
+		try
+		{
+			var r = rangy.deserializeRange(serialized, content_layer);
+			
+			applier.applyToRange(r);
+		}
+		catch (err)
+		{
+		}
+	}
+}
+
+function selection_HTML()
+{
+    var sel = rangy.getSelection();
+
+    range = sel.getRangeAt(0);
+
+    var fragment = range.cloneContents();
+
+    var body = document.createElement('body');
+
+    var style = document.getElementsByTagName('style').item(0).cloneNode(true);
+
+    body.appendChild( style );
+
+    body.appendChild( fragment );
+
+    return body.outerHTML;
+}
+
+function all_HTML()
+{
+    var contentLayer = document.getElementById('content-layer').cloneNode(true);
+    var content = document.createElement('div');
+    content.innerHTML = contentLayer.innerHTML;
+
+    var body = document.createElement('body');
+
+    var style = document.getElementsByTagName('style').item(0).cloneNode(true);
+
+    body.appendChild( style );
+
+    body.appendChild( content );
+
+    return body.outerHTML;
+}
+
+
+
+
+
+
+
+

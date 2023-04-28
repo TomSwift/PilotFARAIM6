@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <meta name="viewport" content="width=device-width" />
+        <script type="text/javascript" src="rangy-core.js"></script>
+        <script type="text/javascript" src="rangy-cssclassapplier.js"></script>
+        <script type="text/javascript" src="rangy-serializer.js"></script>
+        <script type="text/javascript" src="pfa.js"></script>
+        <style type="text/css">
+
+                  body
+                  {
+                      padding-top: 65px;
+                      margin-top: -15px;
+                      font-size: {FONT-SIZE};
+                  }
+                  div .listitem
+                  {
+                      margin-left: 10px;
+            	margin-top: 10px;
+                  }
+                  .changes-none
+                  {
+                      padding-left: 5px;
+                      border-left: 5px solid black;
+                  }
+                  .changes-added
+                  {
+                      display: none;
+            	border-style: dashed;
+            	border-width: 3px;
+            	border-color: green;
+                      background-color: LightCyan;
+            	border-radius: 6px;
+            	margin: 8px 8px 0px 8px;
+            	padding: 0px 8px 2px 8px;
+                  }
+                  .changes-deleted
+                  {
+                      display: none;
+            	border-style: dashed;
+            	border-width: 3px;
+            	border-color: red;
+            	border-radius: 6px;
+            	margin: 8px 8px 0px 8px;
+            	padding: 0px 8px 2px 8px;
+                  }
+            .changes-deleted span
+            {
+            	text-decoration: line-through;
+            }
+            .changes-added h1
+            {
+            	font-size: small;
+            	font-weight: bold;
+            	text-decoration: underline;
+            	color: green;
+            }
+            .changes-deleted h1
+            {
+            	font-size: small;
+            	font-weight: bold;
+            	text-decoration: underline;
+            	color: red;
+            }
+
+                  .modified
+                  {
+                      background-color: LightYellow;
+                  }
+
+            .fixer
+            {
+            	color:transparent;
+            	font-size: xx-small;
+                      display:inline;
+            }
+                  .search-results-layer
+                  {
+            	top: -5px;
+                      position:relative;
+                      color: transparent;
+                      margin: 5px 5px 5px 5px;
+                      width: 100%;
+                  }
+                  .search-results-layer p:first-child
+                  {
+                  }
+                  .content-layer
+                  {
+                      position: absolute;
+                      top: 0px;
+                      left: 0px;
+                      color: black;
+                      width: 100%;
+                  }
+                  .search-result
+                  {
+            	border-radius: 6px;
+                      background-color: orange;
+            	margin: 0px -6px -2px -6px;
+            	padding: 0px 6px 2px 6px;
+                  }
+            .user-highlight
+            {
+            	border-radius: 6px;
+            	background-color: yellow;
+            	margin: 0px -5px -2px -5px;
+            	padding: 0px 5px 2px 5px;
+            }
+        </style>
+    </head>
+    <body onload="highlight_init();">
+        {CONTENT}
+    </body>
+</html>

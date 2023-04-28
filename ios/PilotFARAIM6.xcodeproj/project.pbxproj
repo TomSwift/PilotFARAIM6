@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		014DB59E29F7719D00E980F4 /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 014DB59B29F7719D00E980F4 /* sqlite3.c */; };
 		01E4BEDF29F34324008C5317 /* cfr.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 01E4BEDE29F34323008C5317 /* cfr.sqlite */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -18,9 +17,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		014DB59B29F7719D00E980F4 /* sqlite3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sqlite3.c; sourceTree = "<group>"; };
-		014DB59C29F7719D00E980F4 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
-		014DB59D29F7719D00E980F4 /* sqlite3ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3ext.h; sourceTree = "<group>"; };
 		01E4BEDE29F34323008C5317 /* cfr.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = cfr.sqlite; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* PilotFARAIM6.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PilotFARAIM6.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = PilotFARAIM6/AppDelegate.h; sourceTree = "<group>"; };
@@ -53,17 +49,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		014DB59A29F7719D00E980F4 /* SQLite */ = {
-			isa = PBXGroup;
-			children = (
-				014DB59B29F7719D00E980F4 /* sqlite3.c */,
-				014DB59C29F7719D00E980F4 /* sqlite3.h */,
-				014DB59D29F7719D00E980F4 /* sqlite3ext.h */,
-			);
-			name = SQLite;
-			path = PilotFARAIM6/SQLite;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* PilotFARAIM6 */ = {
 			isa = PBXGroup;
 			children = (
@@ -105,7 +90,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				014DB59A29F7719D00E980F4 /* SQLite */,
 				01E4BEDE29F34323008C5317 /* cfr.sqlite */,
 				13B07FAE1A68108700A75B9A /* PilotFARAIM6 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -319,7 +303,6 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				C91391C8BB8E2AE9CEBCBBB6 /* ExpoModulesProvider.swift in Sources */,
-				014DB59E29F7719D00E980F4 /* sqlite3.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,9 +322,6 @@
 					"COCOAPODS=1",
 					"FB_SONARKIT_ENABLED=1",
 					"HERMES_ENABLE_DEBUGGER=1",
-					SQLITE_ENABLE_FTS3_PARENTHESIS,
-					SQLITE_ENABLE_FTS3,
-					SQLITE_ENABLE_MEMORY_MANAGEMENT,
 				);
 				INFOPLIST_FILE = PilotFARAIM6/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

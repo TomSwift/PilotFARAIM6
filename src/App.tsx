@@ -1,6 +1,15 @@
 import React from "react";
 import type { PropsWithChildren } from "react";
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from "react-native";
+import {
+    ActivityIndicator,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    View,
+} from "react-native";
 
 import {
     Colors,
@@ -13,6 +22,7 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { CfrReferenceView } from "./cfr/cfrReferenceView";
+import { DocumentContext, DocumentProvider } from "./document/DocumentContext";
 
 type SectionProps = PropsWithChildren<{
     title: string;
@@ -88,12 +98,23 @@ const Tab = createBottomTabNavigator();
 
 function App(): JSX.Element {
     return (
-        <NavigationContainer>
-            <Tab.Navigator initialRouteName="FAR">
-                <Tab.Screen name="FAR" component={CfrReferenceView} />
-                <Tab.Screen name="AIM" component={Content} />
-            </Tab.Navigator>
-        </NavigationContainer>
+        <DocumentProvider>
+            <DocumentContext.Consumer>
+                {(document?: Document) => {
+                    if (!document) {
+                        return <ActivityIndicator />;
+                    }
+                    return (
+                        <NavigationContainer>
+                            <Tab.Navigator initialRouteName="FAR">
+                                <Tab.Screen name="FAR" component={CfrReferenceView} />
+                                <Tab.Screen name="AIM" component={Content} />
+                            </Tab.Navigator>
+                        </NavigationContainer>
+                    );
+                }}
+            </DocumentContext.Consumer>
+        </DocumentProvider>
     );
 }
 

@@ -1943,19 +1943,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/websql@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@expo/websql@npm:1.0.1"
-  dependencies:
-    argsarray: ^0.0.1
-    immediate: ^3.2.2
-    noop-fn: ^1.0.0
-    pouchdb-collections: ^1.0.1
-    tiny-queue: ^0.2.1
-  checksum: 9458137b3c59774ca8bf18e2289ee2fd15c710a8017c84be49f78d9b988d6234b02388de2786b44ed22e906e006c3c131413e90e3b703b00886269ddea76cc5d
-  languageName: node
-  linkType: hard
-
 "@expo/xcpretty@npm:^4.2.1":
   version: 4.2.2
   resolution: "@expo/xcpretty@npm:4.2.2"
@@ -3984,13 +3971,6 @@ __metadata:
   version: 2.0.1
   resolution: "argparse@npm:2.0.1"
   checksum: 83644b56493e89a254bae05702abf3a1101b4fa4d0ca31df1c9985275a5a5bd47b3c27b7fa0b71098d41114d8ca000e6ed90cad764b306f8a503665e4d517ced
-  languageName: node
-  linkType: hard
-
-"argsarray@npm:^0.0.1":
-  version: 0.0.1
-  resolution: "argsarray@npm:0.0.1"
-  checksum: 0042accbc0a2d855ad5af56df49291e0e4cae7456f42d486f4cb05518c8e1939bf8aca7dece89d846349d615793fae2cea8ebb20a8207c0f22dafb88b1536819
   languageName: node
   linkType: hard
 
@@ -6522,17 +6502,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-sqlite@npm:^11.1.1":
-  version: 11.1.1
-  resolution: "expo-sqlite@npm:11.1.1"
-  dependencies:
-    "@expo/websql": ^1.0.1
-  peerDependencies:
-    expo: "*"
-  checksum: bc7b6755446f88e9eff6d1e99bd3471a829b02a6585e25daf6f01466b689341012e8044ca404dc2c9f1390c2242bce8bb3c3c6e9364b793cf9740ee67fb7a717
-  languageName: node
-  linkType: hard
-
 "expo@npm:^48.0.11":
   version: 48.0.12
   resolution: "expo@npm:48.0.12"
@@ -7709,13 +7678,6 @@ __metadata:
   bin:
     image-size: bin/image-size.js
   checksum: cfd01d7672d584a4dd09d29bcf593c4bec3c9bb63769a51f735bd10673a7ddce7445da79771ea70b582a114b35bb4c148366b027ee9d1071c1a051aead54c788
-  languageName: node
-  linkType: hard
-
-"immediate@npm:^3.2.2":
-  version: 3.3.0
-  resolution: "immediate@npm:3.3.0"
-  checksum: 634b4305101e2452eba6c07d485bf3e415995e533c94b9c3ffbc37026fa1be34def6e4f2276b0dc2162a3f91628564a4bfb26280278b89d3ee54624e854d2f5f
   languageName: node
   linkType: hard
 
@@ -10758,13 +10720,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"noop-fn@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "noop-fn@npm:1.0.0"
-  checksum: e271f0590c06283d6216e268507fdab066d52164d7281cef1b99a2f40442c85297341c0e37a8fcbc9da95ea6cead7a87a69937c71a80fb3630b909d08b4e8c19
-  languageName: node
-  linkType: hard
-
 "nopt@npm:^6.0.0":
   version: 6.0.0
   resolution: "nopt@npm:6.0.0"
@@ -11747,7 +11702,6 @@ __metadata:
     eslint-config-prettier: ^8.8.0
     expo: ^48.0.11
     expo-file-system: ^15.2.2
-    expo-sqlite: ^11.1.1
     jest: ^29.2.1
     metro-react-native-babel-preset: 0.73.9
     prettier: ^2.4.1
@@ -11755,6 +11709,7 @@ __metadata:
     react-native: ^0.71.6
     react-native-gesture-handler: ^2.9.0
     react-native-http-bridge-refurbished: "workspace:^"
+    react-native-local-resource: ^0.1.6
     react-native-quick-sqlite: ^8.0.2
     react-native-safe-area-context: ^4.5.1
     react-native-screens: ^3.20.0
@@ -11839,13 +11794,6 @@ __metadata:
     cssesc: ^3.0.0
     util-deprecate: ^1.0.2
   checksum: 0b01aa9c2d2c8dbeb51e9b204796b678284be9823abc8d6d40a8b16d4149514e922c264a8ed4deb4d6dbced564b9be390f5942c058582d8656351516d6c49cde
-  languageName: node
-  linkType: hard
-
-"pouchdb-collections@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "pouchdb-collections@npm:1.0.1"
-  checksum: 5ac0c3f678406c143d99f5706123ab7d65bfd60a481a7eae2487ad355f5d3c926af0f0acfa9e47ff3e9d2aa0a782cca4431a37ba77d1a02cfd380c5cf5d6aef8
   languageName: node
   linkType: hard
 
@@ -12225,6 +12173,15 @@ __metadata:
     semantic-release: ^21.0.1
   languageName: unknown
   linkType: soft
+
+"react-native-local-resource@npm:^0.1.6":
+  version: 0.1.6
+  resolution: "react-native-local-resource@npm:0.1.6"
+  peerDependencies:
+    react-native: ^0.41.2
+  checksum: 44204bd0a53d20d105e32474b560ee836650fdc551ae32ca31a80aa239b09d3c882becb4e0d3f6e6233f157b21c984897b1f294f72ed4d480a13107124e1d589
+  languageName: node
+  linkType: hard
 
 "react-native-quick-sqlite@npm:^8.0.2":
   version: 8.0.2
@@ -14079,13 +14036,6 @@ __metadata:
   version: 2.3.8
   resolution: "through@npm:2.3.8"
   checksum: a38c3e059853c494af95d50c072b83f8b676a9ba2818dcc5b108ef252230735c54e0185437618596c790bbba8fcdaef5b290405981ffa09dce67b1f1bf190cbd
-  languageName: node
-  linkType: hard
-
-"tiny-queue@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "tiny-queue@npm:0.2.1"
-  checksum: 9fb00beb47da966cc9296af5049077a656f6111ffb5a20b38a068659b30d8459f8f80b7bcf938e15547c321ecb7da8d001f38c2c847c0492633ae3b69550a4df
   languageName: node
   linkType: hard
 
