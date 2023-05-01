@@ -3,30 +3,7 @@ import { useCallback, useEffect, useReducer } from "react";
 import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
-import { XElement } from "./types";
-
-enum SdItemType {
-    Content = 100,
-    ListItem = 101,
-    Figure = 102,
-    Table = 103,
-}
-
-type SdItem = {
-    rowid: number;
-    pid: number;
-    refid: string;
-    type: SdItemType | number;
-    tag: string | null;
-    title: string | null;
-    l: number;
-    r: number;
-    p: number;
-    i: number;
-    content: string | null;
-};
-
-type SdItemContent = Omit<SdItem, "l" | "p" | "i" | "pid"> & { content: string | null };
+import { SdItem, SdItemContent, SdItemGroup, SdItemType, SdToc, XElement } from "./types";
 
 type Document = {
     db?: QuickSQLiteConnection;
@@ -34,6 +11,7 @@ type Document = {
     documentPageCount: (docid: string) => Promise<number>;
     itemForDocumentPage: (docid: string, page: number) => Promise<SdItem>;
     htmlForDocumentPage: (docid: string, page: number) => Promise<string>;
+    tocWithRoot: (root: string) => Promise<SdToc>;
 };
 
 export const DocumentContext = React.createContext<Document | undefined>(undefined);
@@ -206,9 +184,54 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
         [state.db],
     );
 
+    const tocWithRoot = useCallback(
+        async (root: string) => {
+            const tocItemTypes = [5, 6];
+            const rootType = tocItemTypes[0];
+            const parentTypes = Array.from(Array(rootType - 1).keys()).map((x) => x + 1);
+            const toc: Array<any> = [];
+            const sectionHeaders: Record<number, any> = {};
+
+            const pidsResult = state.db?.execute(
+                "SELECT pid, l, r FROM sd_structure WHERE type = ? GROUP BY pid ORDER BY l",
+                [rootType],
+            );
+            pidsResult?.rows?._array.forEach((item: { pid: number; l: number; r: number }) => {
+                const sectionHeader: SdItemGroup = {
+                    index: toc.length,
+                    parents: {},
+                    children: [],
+                };
+
+                toc.push(sectionHeader);
+
+                sectionHeaders[item.pid] = sectionHeader;
+
+                const parentsResult = state.db?.execute(
+                    `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(",")}) AND +l < ? AND +r > ?`,
+                    [item.l, item.r],
+                );
+
+                parentsResult?.rows?._array.forEach((parent: SdItem) => {
+                    sectionHeader.parents[parent.type] = parent;
+                });
+            });
+
+            const partsResult = state.db?.execute("SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l", [
+                rootType,
+            ]);
+            partsResult?.rows?._array.forEach((part: SdItem) => {
+                const sectionHeader = sectionHeaders[part.pid];
+                sectionHeader.children.push(part);
+            });
+            return toc;
+        },
+        [state.db],
+    );
+
     return (
         <DocumentContext.Provider
-            value={{ db: state.db, asset, documentPageCount, itemForDocumentPage, htmlForDocumentPage }}
+            value={{ db: state.db, asset, documentPageCount, itemForDocumentPage, htmlForDocumentPage, tocWithRoot }}
         >
             {children}
         </DocumentContext.Provider>

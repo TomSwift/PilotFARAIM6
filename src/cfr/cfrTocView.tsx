@@ -1,37 +1,52 @@
-import React from "react";
-import { Text, View, SectionList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, SectionList, SectionListData } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { usePfaDocument } from "../document/usePfaDocument";
+import { SdItem, SdItemGroup } from "../document/types";
+import { toTitleCase } from "titlecase";
 
 const Stack = createStackNavigator();
 
 function CfrTocView() {
-    const sections = React.useMemo(() => {
-        return [
-            {
-                title: "One",
-                data: ["a", "b", "c"],
-            },
-            {
-                title: "Two",
-                data: ["d", "e", "f"],
-            },
-            {
-                title: "Three",
-                data: ["g", "h", "i"],
-            },
-        ];
-    }, []);
+    const { tocWithRoot } = usePfaDocument();
+    const [sections, setSections] = useState<Array<any>>([]);
+
+    useEffect(() => {
+        (async () => {
+            const toc = await tocWithRoot("");
+            // console.log(JSON.stringify(toc));
+
+            const ss = toc.map((itemGroup: SdItemGroup) => {
+                return {
+                    ...itemGroup,
+                    data: [...(itemGroup.children ?? [])],
+                };
+            });
+            setSections(ss);
+        })();
+    }, [tocWithRoot]);
+
+    function renderSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
+        // console.log(JSON.stringify(section));
+        return (
+            <View style={{ backgroundColor: "gray" }}>
+                {Object.entries(section.parents).map(([key, item]) => {
+                    return <Text key={item.rowid.toString()}>{item.title}</Text>;
+                })}
+            </View>
+        );
+    }
 
     return (
-        <SectionList
+        <SectionList<SdItem, SdItemGroup>
             sections={sections}
-            keyExtractor={(item, index) => item + index}
+            keyExtractor={(item) => item.rowid.toString()}
             renderItem={({ item }) => (
                 <View>
-                    <Text>{item}</Text>
+                    <Text>{toTitleCase(item.title?.toLowerCase())}</Text>
                 </View>
             )}
-            renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+            renderSectionHeader={renderSectionHeader}
         />
     );
 }
