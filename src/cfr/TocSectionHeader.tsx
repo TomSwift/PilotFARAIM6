@@ -1,9 +1,9 @@
+import * as React from "react";
+import { Text, View } from "react-native";
 import { SectionListData } from "react-native/types";
 import { SdItem, SdItemGroup } from "../document/types";
-function TocSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {}
 
-function renderSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
-    // console.log(JSON.stringify(section));
+export function TocSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
     return (
         <View style={{ backgroundColor: "gray" }}>
             {Object.entries(section.parents).map(([key, item]) => {

@@ -11,7 +11,7 @@ type Document = {
     documentPageCount: (docid: string) => Promise<number>;
     itemForDocumentPage: (docid: string, page: number) => Promise<SdItem>;
     htmlForDocumentPage: (docid: string, page: number) => Promise<string>;
-    tocWithRoot: (root: string) => Promise<SdToc>;
+    tocForRoot: (root?: SdItem) => Promise<SdToc>;
 };
 
 export const DocumentContext = React.createContext<Document | undefined>(undefined);
@@ -184,54 +184,174 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
         [state.db],
     );
 
-    const tocWithRoot = useCallback(
-        async (root: string) => {
-            const tocItemTypes = [5, 6];
-            const rootType = tocItemTypes[0];
-            const parentTypes = Array.from(Array(rootType - 1).keys()).map((x) => x + 1);
-            const toc: Array<any> = [];
-            const sectionHeaders: Record<number, any> = {};
+    const rootToc = useCallback(async () => {
+        const tocItemTypes = [5, 6];
+        const rootType = tocItemTypes[0];
+        const parentTypes = Array.from(Array(rootType - 1).keys()).map((x) => x + 1);
+        const toc: Array<any> = [];
+        const sectionHeaders: Record<number, any> = {};
 
-            const pidsResult = state.db?.execute(
-                "SELECT pid, l, r FROM sd_structure WHERE type = ? GROUP BY pid ORDER BY l",
-                [rootType],
+        const pidsResult = state.db?.execute(
+            "SELECT pid, l, r FROM sd_structure WHERE type = ? GROUP BY pid ORDER BY l",
+            [rootType],
+        );
+        pidsResult?.rows?._array.forEach((item: { pid: number; l: number; r: number }) => {
+            const sectionHeader: SdItemGroup = {
+                index: toc.length,
+                parents: {},
+                children: [],
+            };
+
+            toc.push(sectionHeader);
+
+            sectionHeaders[item.pid] = sectionHeader;
+
+            const parentsResult = state.db?.execute(
+                `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(",")}) AND +l < ? AND +r > ?`,
+                [item.l, item.r],
             );
-            pidsResult?.rows?._array.forEach((item: { pid: number; l: number; r: number }) => {
-                const sectionHeader: SdItemGroup = {
-                    index: toc.length,
-                    parents: {},
-                    children: [],
-                };
 
-                toc.push(sectionHeader);
-
-                sectionHeaders[item.pid] = sectionHeader;
-
-                const parentsResult = state.db?.execute(
-                    `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(",")}) AND +l < ? AND +r > ?`,
-                    [item.l, item.r],
-                );
-
-                parentsResult?.rows?._array.forEach((parent: SdItem) => {
-                    sectionHeader.parents[parent.type] = parent;
-                });
+            parentsResult?.rows?._array.forEach((parent: SdItem) => {
+                sectionHeader.parents[parent.type] = parent;
             });
+        });
 
-            const partsResult = state.db?.execute("SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l", [
-                rootType,
-            ]);
-            partsResult?.rows?._array.forEach((part: SdItem) => {
-                const sectionHeader = sectionHeaders[part.pid];
-                sectionHeader.children.push(part);
-            });
-            return toc;
+        const partsResult = state.db?.execute("SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l", [
+            rootType,
+        ]);
+        partsResult?.rows?._array.forEach((part: SdItem) => {
+            const sectionHeader = sectionHeaders[part.pid];
+            sectionHeader.children.push(part);
+        });
+        return toc;
+    }, [state.db]);
+
+    const parentsForDocItem = useCallback(
+        async (docItem: SdItem) => {
+            const parents: Array<SdItem> = [];
+
+            while (true) {
+                const rs = state.db?.execute(`SELECT rowid, * FROM sd_structure WHERE rowid = ? LIMIT 1`, [
+                    docItem.pid,
+                ]);
+                if (!rs?.rows?.length) {
+                    return parents;
+                } else {
+                    docItem = rs.rows.item(0) as SdItem;
+                    parents.splice(0, 0, docItem);
+                }
+            }
         },
         [state.db],
     );
 
+    const tocForRoot = useCallback(
+        async (docItem?: SdItem) => {
+            if (!docItem) {
+                return rootToc();
+            }
+
+            const sectionHeader: SdItemGroup = {
+                index: 0,
+                parents: (await parentsForDocItem(docItem)).reduce(
+                    (accumulator, p) => {
+                        accumulator[p.type] = p;
+                        return accumulator;
+                    },
+                    {
+                        [docItem.type]: docItem,
+                    },
+                ),
+                children: [],
+            };
+
+            console.log(`here: ${JSON.stringify(sectionHeader)}`);
+
+            const childTypes = [7, 8, 9].filter((x) => x >= docItem.type + 1);
+
+            const rsChildren = state.db?.execute(
+                `SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( ${childTypes.join(",")} )`,
+                [docItem.rowid],
+            );
+
+            rsChildren?.rows?._array.forEach((childItem: SdItem) => {
+                sectionHeader.children.push(childItem);
+            });
+
+            return [sectionHeader];
+
+            /*
+
+
+
+
+- (NSArray*) tocForDocItem: (SdItem*) docItem includeHidden: (BOOL) includeHidden
+{
+    NSMutableArray* toc = [NSMutableArray arrayWithCapacity:12];
+
+    [self.dbq inDatabase: ^(FMDatabase *db)
+    {
+		
+        @autoreleasepool {
+        
+			SdItemGroup* sectionHeader = [self.docItemGroupClass new];
+			sectionHeader.index = [toc count];
+			[toc addObject: sectionHeader];
+			
+//		NSLog( @"toc start" );
+			
+//		NSLog( @" toc parents l: %@ r:%@", docItem.l, docItem.r );
+			[sectionHeader.parents setObject: docItem forKey: docItem.type];
+			NSArray* parents = [self parentsForDocItem: docItem database: db];
+			for ( SdItem* e in parents )
+			{
+				[sectionHeader.parents setObject: e forKey: e.type];
+			}
+        
+        // child types
+        NSMutableArray* childTypesArray = [NSMutableArray arrayWithCapacity:8];
+        for ( int t = [docItem.type intValue] + 1 ; t <= [[self.pageItemTypes lastObject] intValue] ; t++ )
+        {
+            [childTypesArray addObject: [NSNumber numberWithInt: t]];
+        }
+        NSString* childTypes = [childTypesArray componentsJoinedByString: @","];
+            
+			
+			// get all items below this item
+//		NSLog( @" toc children		" );
+			FMResultSet* rsChildren = nil;
+			if ( YES == includeHidden )
+			{
+				rsChildren = [db executeQuery: [NSString stringWithFormat: @"SELECT s.rowid, s.*, hidden FROM sd_structure s LEFT OUTER JOIN doc_user.sd_toc_visibility t ON t.element_refid = s.refid WHERE s.type IN ( %@ ) AND pid = ?", childTypes], docItem.rowid];
+			}
+			else 
+			{
+				rsChildren = [db executeQuery: [NSString stringWithFormat: @"SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( %@ ) AND refid NOT IN ( SELECT element_refid FROM doc_user.sd_toc_visibility )", childTypes], docItem.rowid];
+			}
+			while ( [rsChildren next] )
+			{
+            SdItem* e = [SdItem docItemOfClass: self.docItemClass fromResultSet: rsChildren];
+            			
+				[sectionHeader.children addObject: e];
+			}
+			
+			[rsChildren close];
+			
+//		NSLog( @"toc end" );
+        
+		}
+	}];
+
+    return toc;
+}
+        */
+        },
+        [parentsForDocItem, rootToc, state.db],
+    );
+
     return (
         <DocumentContext.Provider
-            value={{ db: state.db, asset, documentPageCount, itemForDocumentPage, htmlForDocumentPage, tocWithRoot }}
+            value={{ db: state.db, asset, documentPageCount, itemForDocumentPage, htmlForDocumentPage, tocForRoot }}
         >
             {children}
         </DocumentContext.Provider>
