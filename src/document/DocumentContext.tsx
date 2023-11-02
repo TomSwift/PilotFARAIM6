@@ -171,7 +171,8 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
             // console.log(JSON.stringify(root, null, 3));
 
             const template = asset("cfr-template.html")?.content;
-            return template?.replace(/\{CONTENT\}/, htmlForElement(root)) || "";
+            const html = template?.replace(/\{CONTENT\}/, htmlForElement(root)) || "";
+            return html;
         },
         [state.db, asset, itemForDocumentPage],
     );
@@ -191,11 +192,11 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
         const toc: Array<any> = [];
         const sectionHeaders: Record<number, any> = {};
 
-        const pidsResult = state.db?.execute(
+        const pidsResult = await state.db?.executeAsync(
             "SELECT pid, l, r FROM sd_structure WHERE type = ? GROUP BY pid ORDER BY l",
             [rootType],
         );
-        pidsResult?.rows?._array.forEach((item: { pid: number; l: number; r: number }) => {
+        pidsResult?.rows?._array.forEach(async (item: { pid: number; l: number; r: number }) => {
             const sectionHeader: SdItemGroup = {
                 index: toc.length,
                 parents: {},
@@ -206,7 +207,7 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
 
             sectionHeaders[item.pid] = sectionHeader;
 
-            const parentsResult = state.db?.execute(
+            const parentsResult = await state.db?.executeAsync(
                 `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(",")}) AND +l < ? AND +r > ?`,
                 [item.l, item.r],
             );
@@ -216,9 +217,10 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
             });
         });
 
-        const partsResult = state.db?.execute("SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l", [
-            rootType,
-        ]);
+        const partsResult = await state.db?.executeAsync(
+            "SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l",
+            [rootType],
+        );
         partsResult?.rows?._array.forEach((part: SdItem) => {
             const sectionHeader = sectionHeaders[part.pid];
             sectionHeader.children.push(part);
@@ -231,7 +233,7 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
             const parents: Array<SdItem> = [];
 
             while (true) {
-                const rs = state.db?.execute(`SELECT rowid, * FROM sd_structure WHERE rowid = ? LIMIT 1`, [
+                const rs = await state.db?.executeAsync(`SELECT rowid, * FROM sd_structure WHERE rowid = ? LIMIT 1`, [
                     docItem.pid,
                 ]);
                 if (!rs?.rows?.length) {
@@ -265,17 +267,15 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
                 children: [],
             };
 
-            console.log(`here: ${JSON.stringify(sectionHeader)}`);
-
             const childTypes = [7, 8, 9].filter((x) => x >= docItem.type + 1);
 
-            const rsChildren = state.db?.execute(
+            const rsChildren = await state.db?.executeAsync(
                 `SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( ${childTypes.join(",")} )`,
                 [docItem.rowid],
             );
 
             rsChildren?.rows?._array.forEach((childItem: SdItem) => {
-                sectionHeader.children.push(childItem);
+                sectionHeader.children.push({ ...childItem, isPageItem: true });
             });
 
             return [sectionHeader];

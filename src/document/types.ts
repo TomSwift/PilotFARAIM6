@@ -24,6 +24,7 @@ export type SdItem = {
     p: number;
     i: number;
     content: string | null;
+    isPageItem?: true;
 };
 
 export type SdItemContent = Omit<SdItem, "l" | "p" | "i" | "pid"> & { content: string | null };

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { SplitView } from "./splitView";
-import { ReferenceContentView } from "./referenceContentView";
+import { ReferenceContentView, ReferenceContentViewContext } from "./referenceContentView";
 
 type Props = {
     TocView: React.ComponentType;
@@ -8,5 +8,11 @@ type Props = {
 };
 
 export function ReferenceView({ TocView, ContentView }: Props) {
-    return <SplitView Master={TocView} Detail={ContentView ?? ReferenceContentView} />;
+    const [index, setIndex] = useState(0);
+
+    return (
+        <ReferenceContentViewContext.Provider value={{ index, setIndex }}>
+            <SplitView Master={TocView} Detail={ContentView ?? ReferenceContentView} />
+        </ReferenceContentViewContext.Provider>
+    );
 }

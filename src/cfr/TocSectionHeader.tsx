@@ -6,7 +6,7 @@ import { SdItem, SdItemGroup } from "../document/types";
 export function TocSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
     return (
         <View style={{ backgroundColor: "gray" }}>
-            {Object.entries(section.parents).map(([key, item]) => {
+            {Object.entries(section.parents).map(([_, item]) => {
                 return <Text key={item.rowid.toString()}>{item.title}</Text>;
             })}
         </View>
