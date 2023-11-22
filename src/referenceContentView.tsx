@@ -56,8 +56,7 @@ export function ReferenceContentView() {
             if (result) {
                 console.log(result.refid);
                 document.itemForDocumentRefid(result.refid).then((item: SdItem) => {
-                    console.log(JSON.stringify(item));
-                    r?.setIndex(1);
+                    r?.setIndex(item.i);
                 });
             }
             return false;

@@ -109,7 +109,6 @@ export abstract class Document {
     
     public async htmlForDocumentPage(page: number): Promise<string> {
         const { l, r } = await this.itemForDocumentPage(page);
-        console.log(`LR: ${l} ${r}`);
         return this.html(l, r);
     }
 
@@ -222,6 +221,10 @@ export abstract class Document {
             return {
                 refid: refid.slice(0, split-1),
                 location: refid.slice(split)
+            }
+        } else {
+            return {
+                refid
             }
         }
     }
