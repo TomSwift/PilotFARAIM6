@@ -199,7 +199,8 @@ export abstract class Document {
             children: [],
         };
 
-        const childTypes = this._pageTypes.filter((x) => x >= docItem.type + 1);
+        // any item type greater than the docItem.type up to the max pageType
+        const childTypes = Array(this._pageTypes[this._pageTypes.length-1]-docItem.type).fill(0).map((_, i) => docItem.type + i + 1);        
 
         const rsChildren = await this.db?.executeAsync(
             `SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( ${childTypes.join(",")} )`,
@@ -207,7 +208,7 @@ export abstract class Document {
         );
 
         rsChildren?.rows?._array.forEach((childItem: SdItem) => {
-            sectionHeader.children.push({ ...childItem, isPageItem: true });
+            sectionHeader.children.push({ ...childItem, isPageItem: childItem.i !== null ? true : undefined });
         });
 
         return [sectionHeader];
