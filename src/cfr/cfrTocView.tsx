@@ -5,7 +5,8 @@ import { usePfaDocument } from "../document/usePfaDocument";
 import { SdItem, SdItemGroup } from "../document/types";
 import { toTitleCase } from "titlecase";
 import { useNavigation } from "@react-navigation/native";
-import { ReferenceContentViewContext } from "../referenceContentView";
+import { ReferenceContentViewContext } from "../ReferenceContentView";
+import { CfrDocument } from "./CfrDocument";
 
 type RootStackParamList = {
     CfrToc: { rootItem?: SdItem };
@@ -52,12 +53,14 @@ function CfrTocSectionHeader({ section }: { section: SectionListData<SdItem, SdI
 type Props = StackScreenProps<RootStackParamList, "CfrToc">;
 
 function CfrTocView(props: Props) {
-    const { tocForRoot } = usePfaDocument();
+    const {docid} = useContext(ReferenceContentViewContext);
+
+    const document  = usePfaDocument(docid);
     const [sections, setSections] = useState<Array<any>>([]);
 
     useEffect(() => {
         (async () => {
-            const toc = await tocForRoot(props.route.params?.rootItem);
+            const toc = await document.tocForRoot(props.route.params?.rootItem);
 
             const ss = toc.map((itemGroup: SdItemGroup) => {
                 return {
@@ -67,7 +70,7 @@ function CfrTocView(props: Props) {
             });
             setSections(ss);
         })();
-    }, [props.route.params?.rootItem, tocForRoot]);
+    }, [props.route.params?.rootItem, document]);
 
     return (
         <SectionList<SdItem, SdItemGroup>

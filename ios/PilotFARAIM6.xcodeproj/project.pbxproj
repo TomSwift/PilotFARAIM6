@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		C5CB0D3E2B0E6D0B00EAE0DB /* aim.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C5CB0D3D2B0E6D0B00EAE0DB /* aim.sqlite */; };
 		C91391C8BB8E2AE9CEBCBBB6 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546610539D2E7B0556240EAC /* ExpoModulesProvider.swift */; };
 		CDB1561337ED0C00AD60BBDC /* libPods-PilotFARAIM6.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E637EB167201E8F67E7D16E /* libPods-PilotFARAIM6.a */; };
 /* End PBXBuildFile section */
@@ -34,6 +35,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = PilotFARAIM6/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		86A12B23C5F25FAB0A9960E9 /* libPods-PilotFARAIM6-PilotFARAIM6Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PilotFARAIM6-PilotFARAIM6Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-PilotFARAIM6-PilotFARAIM6Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PilotFARAIM6-PilotFARAIM6Tests.release.xcconfig"; path = "Target Support Files/Pods-PilotFARAIM6-PilotFARAIM6Tests/Pods-PilotFARAIM6-PilotFARAIM6Tests.release.xcconfig"; sourceTree = "<group>"; };
+		C5CB0D3D2B0E6D0B00EAE0DB /* aim.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = aim.sqlite; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -90,6 +92,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				C5CB0D3D2B0E6D0B00EAE0DB /* aim.sqlite */,
 				01E4BEDE29F34323008C5317 /* cfr.sqlite */,
 				13B07FAE1A68108700A75B9A /* PilotFARAIM6 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -194,6 +197,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				C5CB0D3E2B0E6D0B00EAE0DB /* aim.sqlite in Resources */,
 				01E4BEDF29F34324008C5317 /* cfr.sqlite in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);

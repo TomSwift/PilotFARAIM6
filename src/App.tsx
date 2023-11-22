@@ -21,7 +21,8 @@ import {
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { CfrReferenceView } from "./cfr/cfrReferenceView";
+import { CfrReferenceView } from "./cfr/CfrReferenceView";
+import { AimReferenceView } from "./aim/AimReferenceView";
 import { DocumentContext, DocumentProvider } from "./document/DocumentContext";
 
 type SectionProps = PropsWithChildren<{
@@ -99,21 +100,12 @@ const Tab = createBottomTabNavigator();
 function App(): JSX.Element {
     return (
         <DocumentProvider>
-            <DocumentContext.Consumer>
-                {(document?: Document) => {
-                    if (!document) {
-                        return <ActivityIndicator />;
-                    }
-                    return (
-                        <NavigationContainer>
-                            <Tab.Navigator initialRouteName="FAR">
-                                <Tab.Screen name="FAR" component={CfrReferenceView} />
-                                <Tab.Screen name="AIM" component={Content} />
-                            </Tab.Navigator>
-                        </NavigationContainer>
-                    );
-                }}
-            </DocumentContext.Consumer>
+            <NavigationContainer>
+                <Tab.Navigator initialRouteName="FAR">
+                    <Tab.Screen name="FAR" component={CfrReferenceView} />
+                    <Tab.Screen name="AIM" component={AimReferenceView} />
+                </Tab.Navigator>
+            </NavigationContainer>
         </DocumentProvider>
     );
 }
