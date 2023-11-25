@@ -1,11 +1,14 @@
-import { QuickSQLite, QuickSQLiteConnection, open } from "react-native-quick-sqlite";
+import {
+    QuickSQLite,
+    QuickSQLiteConnection,
+    open,
+} from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
 import { SdItemContent, SdItemGroup, SdToc, XElement } from "./types";
 import { SdItem, SdItemType } from "./Item";
 
 export abstract class Document {
-    
     protected abstract readonly _tocItemTypes: Array<number>;
     protected abstract readonly _pageTypes: Array<number>;
     private _htmlTemplateName: string;
@@ -16,37 +19,43 @@ export abstract class Document {
     public readonly db: QuickSQLiteConnection;
 
     constructor(dbName: string, htmlTemplateName: string) {
-        this.db = open({ name: dbName});
+        this.db = open({ name: dbName });
         this._htmlTemplateName = htmlTemplateName;
     }
 
     protected abstract item(item: Partial<SdItem>): SdItem;
 
     public async itemForDocumentPage(page: number): Promise<SdItem> {
-        const result = await this.db?.executeAsync("SELECT rowid, * FROM sd_structure WHERE i = ? LIMIT 1", [
-            page,
-        ]);
+        const result = await this.db?.executeAsync(
+            "SELECT rowid, * FROM sd_structure WHERE i = ? LIMIT 1",
+            [page]
+        );
 
         return this.item(result?.rows?.item(0));
     }
 
     public async itemForDocumentRefid(refid: string): Promise<SdItem> {
-        const result = await this.db?.executeAsync("SELECT rowid, * FROM sd_structure WHERE refid = ? LIMIT 1", [
-            refid,
-        ]);
+        const result = await this.db?.executeAsync(
+            "SELECT rowid, * FROM sd_structure WHERE refid = ? LIMIT 1",
+            [refid]
+        );
         return this.item(result?.rows?.item(0));
     }
 
     public async html(l: number, r: number): Promise<string> {
         const result = await this.db?.executeAsync(
             "SELECT s.type, s.tag, s.title, s.r, c.content, s.refid, c.rowid FROM sd_structure s LEFT OUTER JOIN sd_content c ON s.rowid = c.rowid WHERE s.l BETWEEN ? AND ? ORDER BY l ASC",
-            [l, r],
+            [l, r]
         );
         if (!result) {
             return "WTF";
         }
 
-        let root: XElement = { name: "div", content: [], r: Number.MAX_SAFE_INTEGER };
+        let root: XElement = {
+            name: "div",
+            content: [],
+            r: Number.MAX_SAFE_INTEGER,
+        };
 
         let indentStack: Array<XElement> = [root];
 
@@ -101,16 +110,19 @@ export abstract class Document {
         // console.log(JSON.stringify(root, null, 3));
 
         if (!this._htmlTemplate) {
-            this._htmlTemplate = await loadLocalRawResource(require("./assets/cfr-template.html"));
+            this._htmlTemplate = await loadLocalRawResource(
+                require("./assets/cfr-template.html")
+            );
         }
 
-        const html = this._htmlTemplate?.replace(/\{CONTENT\}/, htmlForElement(root)) || "";
+        const html =
+            this._htmlTemplate?.replace(/\{CONTENT\}/, htmlForElement(root)) ||
+            "";
 
         // console.log(root);
         return html;
     }
 
-    
     public async htmlForDocumentPage(page: number): Promise<string> {
         const { l, r } = await this.itemForDocumentPage(page);
         return this.html(l, r);
@@ -122,44 +134,54 @@ export abstract class Document {
     }
 
     public async documentPageCount(_: /*docid*/ string): Promise<number> {
-        const result = this.db?.execute(`SELECT COUNT(*) FROM sd_structure WHERE type IN (${this._pageTypes.join(",")})`);
+        const result = this.db?.execute(
+            `SELECT COUNT(*) FROM sd_structure WHERE type IN (${this._pageTypes.join(
+                ","
+            )})`
+        );
         return result?.rows?.item(0)["COUNT(*)"] || 0;
     }
 
     public async rootToc() {
         const rootType = this._tocItemTypes[0];
-        const parentTypes = Array.from(Array(rootType - 1).keys()).map((x) => x + 1);
+        const parentTypes = Array.from(Array(rootType - 1).keys()).map(
+            (x) => x + 1
+        );
         const toc: Array<any> = [];
         const sectionHeaders: Record<number, any> = {};
 
         const pidsResult = await this.db?.executeAsync(
             "SELECT pid, l, r FROM sd_structure WHERE type = ? GROUP BY pid ORDER BY l",
-            [rootType],
+            [rootType]
         );
-        pidsResult?.rows?._array.forEach(async (item: { pid: number; l: number; r: number }) => {
-            const sectionHeader: SdItemGroup = {
-                index: toc.length,
-                parents: {},
-                children: [],
-            };
+        pidsResult?.rows?._array.forEach(
+            async (item: { pid: number; l: number; r: number }) => {
+                const sectionHeader: SdItemGroup = {
+                    index: toc.length,
+                    parents: {},
+                    children: [],
+                };
 
-            toc.push(sectionHeader);
+                toc.push(sectionHeader);
 
-            sectionHeaders[item.pid] = sectionHeader;
+                sectionHeaders[item.pid] = sectionHeader;
 
-            const parentsResult = await this.db?.executeAsync(
-                `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(",")}) AND +l < ? AND +r > ?`,
-                [item.l, item.r],
-            );
+                const parentsResult = await this.db?.executeAsync(
+                    `SELECT rowid, * FROM sd_structure WHERE type IN ( ${parentTypes.join(
+                        ","
+                    )}) AND +l < ? AND +r > ?`,
+                    [item.l, item.r]
+                );
 
-            parentsResult?.rows?._array.forEach((parent: SdItem) => {
-                sectionHeader.parents[parent.type] = this.item(parent);
-            });
-        });
+                parentsResult?.rows?._array.forEach((parent: SdItem) => {
+                    sectionHeader.parents[parent.type] = this.item(parent);
+                });
+            }
+        );
 
         const partsResult = await this.db?.executeAsync(
             "SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l",
-            [rootType],
+            [rootType]
         );
         partsResult?.rows?._array.forEach((part: SdItem) => {
             const sectionHeader = sectionHeaders[part.pid];
@@ -172,9 +194,10 @@ export abstract class Document {
         const parents: Array<SdItem> = [];
 
         while (true) {
-            const rs = await this.db?.executeAsync(`SELECT rowid, * FROM sd_structure WHERE rowid = ? LIMIT 1`, [
-                docItem.pid,
-            ]);
+            const rs = await this.db?.executeAsync(
+                `SELECT rowid, * FROM sd_structure WHERE rowid = ? LIMIT 1`,
+                [docItem.pid]
+            );
             if (!rs?.rows?.length) {
                 return parents;
             } else {
@@ -198,39 +221,50 @@ export abstract class Document {
                 },
                 {
                     [docItem.type]: docItem,
-                },
+                }
             ),
             children: [],
         };
 
         // any item type greater than the docItem.type up to the max pageType
-        const childTypes = Array(this._pageTypes[this._pageTypes.length-1]-docItem.type).fill(0).map((_, i) => docItem.type + i + 1);        
+        const childTypes = Array(
+            this._pageTypes[this._pageTypes.length - 1] - docItem.type
+        )
+            .fill(0)
+            .map((_, i) => docItem.type + i + 1);
 
         const rsChildren = await this.db?.executeAsync(
-            `SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( ${childTypes.join(",")} )`,
-            [docItem.rowid],
+            `SELECT s.rowid, s.* FROM sd_structure s WHERE pid = ? AND type IN ( ${childTypes.join(
+                ","
+            )} )`,
+            [docItem.rowid]
         );
 
         rsChildren?.rows?._array.forEach((childItem: SdItem) => {
-            sectionHeader.children.push(this.item({ ...childItem, isPageItem: childItem.i !== null ? true : undefined }));
+            sectionHeader.children.push(
+                this.item({
+                    ...childItem,
+                    isPageItem: childItem.i !== null ? true : undefined,
+                })
+            );
         });
 
         return [sectionHeader];
     }
 
     public splitContentRefid(refid: string) {
-        console.log(`splitting refid: ${refid}`)
+        console.log(`splitting refid: ${refid}`);
         var match = /(S|SF|X)(_)([0-9A-Z]+)[\\.]/.exec(refid);
         if (match) {
-            const split = match.index+match.length;
+            const split = match.index + match.length;
             return {
-                refid: refid.slice(0, split-1),
-                location: refid.slice(split)
-            }
+                refid: refid.slice(0, split - 1),
+                location: refid.slice(split),
+            };
         } else {
             return {
-                refid
-            }
+                refid,
+            };
         }
     }
-};
+}

@@ -22,4 +22,4 @@ export abstract class SdItem {
         Object.assign(this, item);
     }
     public abstract description(): string;
-};
+}

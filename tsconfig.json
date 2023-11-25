@@ -1,4 +1,10 @@
 {
     "extends": "@tsconfig/react-native/tsconfig.json",
-    "exclude": ["**/assets/**", "node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+    "exclude": [
+        "**/assets/**",
+        "node_modules",
+        "babel.config.js",
+        "metro.config.js",
+        "jest.config.js"
+    ]
 }

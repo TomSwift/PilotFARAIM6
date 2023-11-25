@@ -3,7 +3,11 @@ import { Text, View } from "react-native";
 import { SectionListData } from "react-native/types";
 import { SdItem, SdItemGroup } from "../document/types";
 
-export function TocSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
+export function TocSectionHeader({
+    section,
+}: {
+    section: SectionListData<SdItem, SdItemGroup>;
+}) {
     return (
         <View style={{ backgroundColor: "gray" }}>
             {Object.entries(section.parents).map(([_, item]) => {

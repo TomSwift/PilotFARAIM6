@@ -1,32 +1,60 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { LayoutChangeEvent, LayoutRectangle, StyleSheet, Text, View, ViewToken, VirtualizedList } from "react-native";
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import {
+    LayoutChangeEvent,
+    LayoutRectangle,
+    StyleSheet,
+    Text,
+    View,
+    ViewToken,
+    VirtualizedList,
+} from "react-native";
 import WebView from "react-native-webview";
 import { usePfaDocument } from "./document/usePfaDocument";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { SdItem } from "./document/types";
 import { Document } from "./document/Document";
 
-function Content({docid, document, index, width}: { docid:string, document: Document, index: number, width: number}) {
-
+function Content({
+    docid,
+    document,
+    index,
+    width,
+}: {
+    docid: string;
+    document: Document;
+    index: number;
+    width: number;
+}) {
     const r = useContext(ReferenceContentViewContext);
 
     const [pageItem, setPageItem] = useState<SdItem>();
 
-    const shouldStartLoadWithRequest = useCallback(( event: ShouldStartLoadRequest) => {
-        console.log(`shouldStart: ${event.url}`)
-        if (event.url.startsWith("pfa:")) {
-            const [_, __, docid, refid] = event.url.split("/");
-            const result = document.splitContentRefid(refid);
-            if (result) {
-                console.log(result.refid);
-                document.itemForDocumentRefid(result.refid).then((item: SdItem) => {
-                    r?.setIndex(item.i);
-                });
+    const shouldStartLoadWithRequest = useCallback(
+        (event: ShouldStartLoadRequest) => {
+            console.log(`shouldStart: ${event.url}`);
+            if (event.url.startsWith("pfa:")) {
+                const [_, __, docid, refid] = event.url.split("/");
+                const result = document.splitContentRefid(refid);
+                if (result) {
+                    console.log(result.refid);
+                    document
+                        .itemForDocumentRefid(result.refid)
+                        .then((item: SdItem) => {
+                            r?.setIndex(item.i);
+                        });
+                }
+                return false;
             }
-            return false;
-        }
-        return true;
-    }, [document]);
+            return true;
+        },
+        [document]
+    );
 
     useEffect(() => {
         document.itemForDocumentPage(index).then((item: SdItem) => {
@@ -34,10 +62,15 @@ function Content({docid, document, index, width}: { docid:string, document: Docu
         });
     }, [index]);
 
-
     return (
-        <View style={{flexDirection:"column"}}>
-            <View style={{width: "100%", height: 40, backgroundColor: "lightGray"}} >
+        <View style={{ flexDirection: "column" }}>
+            <View
+                style={{
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "lightGray",
+                }}
+            >
                 <Text>{pageItem?.description()}</Text>
                 <Text>{pageItem?.title}</Text>
             </View>
@@ -54,14 +87,24 @@ function Content({docid, document, index, width}: { docid:string, document: Docu
 }
 
 type ReferenceContent = {
-    docid: string,
+    docid: string;
     index: number;
     setIndex: (i: number) => void;
 };
-export const ReferenceContentViewContext = React.createContext<ReferenceContent>({ docid: "", index: 0, setIndex: () => {} });
+export const ReferenceContentViewContext =
+    React.createContext<ReferenceContent>({
+        docid: "",
+        index: 0,
+        setIndex: () => {},
+    });
 
 export function ReferenceContentView() {
-    const [layoutRectangle, setLayoutRectangle] = useState<LayoutRectangle>({ x: 0, y: 0, width: 10, height: 10 });
+    const [layoutRectangle, setLayoutRectangle] = useState<LayoutRectangle>({
+        x: 0,
+        y: 0,
+        width: 10,
+        height: 10,
+    });
     function onLayout(event: LayoutChangeEvent) {
         setLayoutRectangle(event.nativeEvent.layout);
     }
@@ -82,12 +125,15 @@ export function ReferenceContentView() {
     }, [document]);
 
     const onChanged = useCallback(
-        (info: { viewableItems: Array<ViewToken>; changed: Array<ViewToken> }) => {
+        (info: {
+            viewableItems: Array<ViewToken>;
+            changed: Array<ViewToken>;
+        }) => {
             if (info.viewableItems?.length > 0) {
                 r?.setIndex(info.viewableItems[0].index || 0);
             }
         },
-        [r],
+        [r]
     );
 
     useEffect(() => {
@@ -96,21 +142,26 @@ export function ReferenceContentView() {
         }
     }, [r, pageCount]);
 
-    const shouldStartLoadWithRequest = useCallback(( event: ShouldStartLoadRequest) => {
-        console.log(`shouldStart: ${event.url}`)
-        if (event.url.startsWith("pfa:")) {
-            const [_, __, docid, refid] = event.url.split("/");
-            const result = document.splitContentRefid(refid);
-            if (result) {
-                console.log(result.refid);
-                document.itemForDocumentRefid(result.refid).then((item: SdItem) => {
-                    r?.setIndex(item.i);
-                });
+    const shouldStartLoadWithRequest = useCallback(
+        (event: ShouldStartLoadRequest) => {
+            console.log(`shouldStart: ${event.url}`);
+            if (event.url.startsWith("pfa:")) {
+                const [_, __, docid, refid] = event.url.split("/");
+                const result = document.splitContentRefid(refid);
+                if (result) {
+                    console.log(result.refid);
+                    document
+                        .itemForDocumentRefid(result.refid)
+                        .then((item: SdItem) => {
+                            r?.setIndex(item.i);
+                        });
+                }
+                return false;
             }
-            return false;
-        }
-        return true;
-    }, [document]);
+            return true;
+        },
+        [document]
+    );
 
     return (
         <View style={StyleSheet.absoluteFill} onLayout={onLayout}>
@@ -136,7 +187,12 @@ export function ReferenceContentView() {
                 }}
                 onViewableItemsChanged={onChanged}
                 renderItem={({ index }) => (
-                    <Content docid={docid} width={layoutRectangle.width} document={document} index={index} />
+                    <Content
+                        docid={docid}
+                        width={layoutRectangle.width}
+                        document={document}
+                        index={index}
+                    />
                 )}
             />
         </View>

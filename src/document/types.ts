@@ -9,7 +9,9 @@ export type XElement = {
     r: number;
 };
 
-export type SdItemContent = Omit<SdItem, "l" | "p" | "i" | "pid"> & { content: string | null };
+export type SdItemContent = Omit<SdItem, "l" | "p" | "i" | "pid"> & {
+    content: string | null;
+};
 
 export type SdItemGroup = {
     index: number;
@@ -18,4 +20,3 @@ export type SdItemGroup = {
 };
 
 export type SdToc = Array<SdItemGroup>;
- 

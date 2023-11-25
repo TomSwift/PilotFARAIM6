@@ -2,28 +2,46 @@ import * as React from "react";
 import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
-import { SdItem, SdItemContent, SdItemGroup, SdItemType, SdToc, XElement } from "./types";
+import {
+    SdItem,
+    SdItemContent,
+    SdItemGroup,
+    SdItemType,
+    SdToc,
+    XElement,
+} from "./types";
 import { CfrDocument } from "../cfr/CfrDocument";
 import { Document } from "./Document";
 import { AimDocument } from "../aim/AimDocument";
 import { BridgeServer } from "react-native-http-bridge-refurbished";
 
-export const DocumentContext = React.createContext<({ documents: Record<string, Document>; } )>({ documents: {} });
+export const DocumentContext = React.createContext<{
+    documents: Record<string, Document>;
+}>({ documents: {} });
 
 interface Asset {
     content: string;
     type: string;
 }
 
-export function DocumentProvider({ children }: { children: React.ReactElement }) {
-    const documents = React.useMemo<Record<string, Document>>(() => ({
-        [CfrDocument.docid]: new CfrDocument(),
-        [AimDocument.docid]: new AimDocument(),
-    }), []);
+export function DocumentProvider({
+    children,
+}: {
+    children: React.ReactElement;
+}) {
+    const documents = React.useMemo<Record<string, Document>>(
+        () => ({
+            [CfrDocument.docid]: new CfrDocument(),
+            [AimDocument.docid]: new AimDocument(),
+        }),
+        []
+    );
 
     React.useEffect(() => {
         return () => {
-            Object.values(documents).forEach((document: Document) => document.db.close());
+            Object.values(documents).forEach((document: Document) =>
+                document.db.close()
+            );
         };
     }, [documents]);
 
@@ -32,20 +50,42 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
     React.useLayoutEffect(() => {
         const server = new BridgeServer("http_service", true);
         (async () => {
-            const [cfrTemplate, pfa, rangyCore, rangySerializer, rangyClassApplier] = await Promise.all([
+            const [
+                cfrTemplate,
+                pfa,
+                rangyCore,
+                rangySerializer,
+                rangyClassApplier,
+            ] = await Promise.all([
                 loadLocalRawResource(require("./assets/cfr-template.html")),
                 loadLocalRawResource(require("./assets/pfa.js_asset")),
                 loadLocalRawResource(require("./assets/rangy-core.js_asset")),
-                loadLocalRawResource(require("./assets/rangy-serializer.js_asset")),
-                loadLocalRawResource(require("./assets/rangy-cssclassapplier.js_asset")),
+                loadLocalRawResource(
+                    require("./assets/rangy-serializer.js_asset")
+                ),
+                loadLocalRawResource(
+                    require("./assets/rangy-cssclassapplier.js_asset")
+                ),
             ]);
 
             const assets: Record<string, Asset> = {
-                    "cfr-template.html": { content: cfrTemplate, type: "text/html" },
-                    "pfa.js": { content: pfa, type: "text/javascript" },
-                    "rangy-core.js": { content: rangyCore, type: "text/javascript" },
-                    "rangy-serializer.js": { content: rangySerializer, type: "text/javascript" },
-                    "rangy-cssclassapplier.js": { content: rangyClassApplier, type: "text/javascript" },
+                "cfr-template.html": {
+                    content: cfrTemplate,
+                    type: "text/html",
+                },
+                "pfa.js": { content: pfa, type: "text/javascript" },
+                "rangy-core.js": {
+                    content: rangyCore,
+                    type: "text/javascript",
+                },
+                "rangy-serializer.js": {
+                    content: rangySerializer,
+                    type: "text/javascript",
+                },
+                "rangy-cssclassapplier.js": {
+                    content: rangyClassApplier,
+                    type: "text/javascript",
+                },
             };
 
             server.get("*", async (req, res) => {
@@ -54,7 +94,13 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
                 const document = documents[docid];
                 if (/[0-9+]/.test(file)) {
                     if (document) {
-                        return res.send(200, "text/html; charset=utf-8", await document.htmlForDocumentPage(parseInt(file, 10)));
+                        return res.send(
+                            200,
+                            "text/html; charset=utf-8",
+                            await document.htmlForDocumentPage(
+                                parseInt(file, 10)
+                            )
+                        );
                     } else {
                         return res.send(404, "", "");
                     }
@@ -80,9 +126,7 @@ export function DocumentProvider({ children }: { children: React.ReactElement })
     }, [documents]);
 
     return ready ? (
-        <DocumentContext.Provider
-            value={{documents}}
-        >
+        <DocumentContext.Provider value={{ documents }}>
             {children}
         </DocumentContext.Provider>
     ) : null;

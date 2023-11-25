@@ -7,7 +7,8 @@
         "ios": "react-native run-ios",
         "lint": "eslint .",
         "start": "react-native start",
-        "test": "jest"
+        "test": "jest",
+        "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
     },
     "dependencies": {
         "@gluestack-style/react": "^1.0.17",

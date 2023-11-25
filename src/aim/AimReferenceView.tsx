@@ -4,5 +4,7 @@ import { AimTocNavigator } from "./AimTocView";
 import { AimDocument } from "./AimDocument";
 
 export function AimReferenceView() {
-    return <ReferenceView docid={AimDocument.docid} TocView={AimTocNavigator} />;
+    return (
+        <ReferenceView docid={AimDocument.docid} TocView={AimTocNavigator} />
+    );
 }

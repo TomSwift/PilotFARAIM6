@@ -1,6 +1,16 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Text, View, SectionList, SectionListData, Pressable } from "react-native";
-import { StackNavigationProp, StackScreenProps, createStackNavigator } from "@react-navigation/stack";
+import {
+    Text,
+    View,
+    SectionList,
+    SectionListData,
+    Pressable,
+} from "react-native";
+import {
+    StackNavigationProp,
+    StackScreenProps,
+    createStackNavigator,
+} from "@react-navigation/stack";
 import { usePfaDocument } from "../document/usePfaDocument";
 import { SdItem, SdItemGroup } from "../document/types";
 import { toTitleCase } from "titlecase";
@@ -30,13 +40,19 @@ function CfrTocItem({ item }: { item: SdItem }) {
     return (
         <Pressable onPress={onPress}>
             <View>
-                <Text style={{ margin: 5 }}>{toTitleCase(item.title?.toLowerCase() ?? "")}</Text>
+                <Text style={{ margin: 5 }}>
+                    {toTitleCase(item.title?.toLowerCase() ?? "")}
+                </Text>
             </View>
         </Pressable>
     );
 }
 
-function CfrTocSectionHeader({ section }: { section: SectionListData<SdItem, SdItemGroup> }) {
+function CfrTocSectionHeader({
+    section,
+}: {
+    section: SectionListData<SdItem, SdItemGroup>;
+}) {
     return (
         <View style={{ backgroundColor: "gray" }}>
             {Object.entries(section.parents).map(([_, item]) => {
@@ -53,9 +69,9 @@ function CfrTocSectionHeader({ section }: { section: SectionListData<SdItem, SdI
 type Props = StackScreenProps<RootStackParamList, "CfrToc">;
 
 function CfrTocView(props: Props) {
-    const {docid} = useContext(ReferenceContentViewContext);
+    const { docid } = useContext(ReferenceContentViewContext);
 
-    const document  = usePfaDocument(docid);
+    const document = usePfaDocument(docid);
     const [sections, setSections] = useState<Array<any>>([]);
 
     useEffect(() => {
