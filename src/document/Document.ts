@@ -1,7 +1,8 @@
 import { QuickSQLite, QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
-import { SdItem, SdItemContent, SdItemGroup, SdItemType, SdToc, XElement } from "./types";
+import { SdItemContent, SdItemGroup, SdToc, XElement } from "./types";
+import { SdItem, SdItemType } from "./Item";
 
 export abstract class Document {
     
@@ -19,18 +20,21 @@ export abstract class Document {
         this._htmlTemplateName = htmlTemplateName;
     }
 
+    protected abstract item(item: Partial<SdItem>): SdItem;
+
     public async itemForDocumentPage(page: number): Promise<SdItem> {
         const result = await this.db?.executeAsync("SELECT rowid, * FROM sd_structure WHERE i = ? LIMIT 1", [
             page,
         ]);
-        return result?.rows?.item(0);
+
+        return this.item(result?.rows?.item(0));
     }
 
     public async itemForDocumentRefid(refid: string): Promise<SdItem> {
         const result = await this.db?.executeAsync("SELECT rowid, * FROM sd_structure WHERE refid = ? LIMIT 1", [
             refid,
         ]);
-        return result?.rows?.item(0);
+        return this.item(result?.rows?.item(0));
     }
 
     public async html(l: number, r: number): Promise<string> {
@@ -149,7 +153,7 @@ export abstract class Document {
             );
 
             parentsResult?.rows?._array.forEach((parent: SdItem) => {
-                sectionHeader.parents[parent.type] = parent;
+                sectionHeader.parents[parent.type] = this.item(parent);
             });
         });
 
@@ -159,7 +163,7 @@ export abstract class Document {
         );
         partsResult?.rows?._array.forEach((part: SdItem) => {
             const sectionHeader = sectionHeaders[part.pid];
-            sectionHeader.children.push(part);
+            sectionHeader.children.push(this.item(part));
         });
         return toc;
     }
@@ -208,7 +212,7 @@ export abstract class Document {
         );
 
         rsChildren?.rows?._array.forEach((childItem: SdItem) => {
-            sectionHeader.children.push({ ...childItem, isPageItem: childItem.i !== null ? true : undefined });
+            sectionHeader.children.push(this.item({ ...childItem, isPageItem: childItem.i !== null ? true : undefined }));
         });
 
         return [sectionHeader];

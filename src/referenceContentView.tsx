@@ -1,9 +1,57 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { LayoutChangeEvent, LayoutRectangle, StyleSheet, View, ViewToken, VirtualizedList } from "react-native";
+import { LayoutChangeEvent, LayoutRectangle, StyleSheet, Text, View, ViewToken, VirtualizedList } from "react-native";
 import WebView from "react-native-webview";
 import { usePfaDocument } from "./document/usePfaDocument";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { SdItem } from "./document/types";
+import { Document } from "./document/Document";
+
+function Content({docid, document, index, width}: { docid:string, document: Document, index: number, width: number}) {
+
+    const r = useContext(ReferenceContentViewContext);
+
+    const [pageItem, setPageItem] = useState<SdItem>();
+
+    const shouldStartLoadWithRequest = useCallback(( event: ShouldStartLoadRequest) => {
+        console.log(`shouldStart: ${event.url}`)
+        if (event.url.startsWith("pfa:")) {
+            const [_, __, docid, refid] = event.url.split("/");
+            const result = document.splitContentRefid(refid);
+            if (result) {
+                console.log(result.refid);
+                document.itemForDocumentRefid(result.refid).then((item: SdItem) => {
+                    r?.setIndex(item.i);
+                });
+            }
+            return false;
+        }
+        return true;
+    }, [document]);
+
+    useEffect(() => {
+        document.itemForDocumentPage(index).then((item: SdItem) => {
+            setPageItem(item);
+        });
+    }, [index]);
+
+
+    return (
+        <View style={{flexDirection:"column"}}>
+            <View style={{width: "100%", height: 40, backgroundColor: "lightGray"}} >
+                <Text>{pageItem?.description()}</Text>
+                <Text>{pageItem?.title}</Text>
+            </View>
+            <WebView
+                key={index}
+                source={{ uri: `http://localhost:3000/${docid}/${index}` }}
+                style={{ width: width }}
+                webviewDebuggingEnabled={true}
+                originWhitelist={["*"]}
+                onShouldStartLoadWithRequest={shouldStartLoadWithRequest}
+            />
+        </View>
+    );
+}
 
 type ReferenceContent = {
     docid: string,
@@ -88,14 +136,7 @@ export function ReferenceContentView() {
                 }}
                 onViewableItemsChanged={onChanged}
                 renderItem={({ index }) => (
-                    <WebView
-                        key={index}
-                        source={{ uri: `http://localhost:3000/${docid}/${index}` }}
-                        style={{ width: layoutRectangle.width }}
-                        webviewDebuggingEnabled={true}
-                        originWhitelist={["*"]}
-                        onShouldStartLoadWithRequest={shouldStartLoadWithRequest}
-                    />
+                    <Content docid={docid} width={layoutRectangle.width} document={document} index={index} />
                 )}
             />
         </View>
