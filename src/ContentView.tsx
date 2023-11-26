@@ -8,6 +8,8 @@ import React, {
 import {
     LayoutChangeEvent,
     LayoutRectangle,
+    SectionListData,
+    SectionListRenderItem,
     StyleSheet,
     Text,
     View,
@@ -17,7 +19,7 @@ import {
 import WebView from "react-native-webview";
 import { usePfaDocument } from "./document/usePfaDocument";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
-import { SdItem } from "./document/types";
+import { SdItem, SdItemGroup } from "./document/types";
 import { Document } from "./document/Document";
 
 function Content({
@@ -90,15 +92,23 @@ type ReferenceContent = {
     docid: string;
     index: number;
     setIndex: (i: number) => void;
+    TocItem: SectionListRenderItem<SdItem>;
+    TocSectionHeader: {
+        (info: {
+            section: SectionListData<SdItem, SdItemGroup>;
+        }): React.ReactElement | null;
+    };
 };
 export const ReferenceContentViewContext =
     React.createContext<ReferenceContent>({
         docid: "",
         index: 0,
         setIndex: () => {},
+        TocItem: () => null,
+        TocSectionHeader: () => null,
     });
 
-export function ReferenceContentView() {
+export function ContentView() {
     const [layoutRectangle, setLayoutRectangle] = useState<LayoutRectangle>({
         x: 0,
         y: 0,
