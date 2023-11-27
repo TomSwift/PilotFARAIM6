@@ -24,19 +24,23 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { CfrReferenceView } from "./cfr/CfrReferenceView";
 import { AimReferenceView } from "./aim/AimReferenceView";
 import { DocumentContext, DocumentProvider } from "./document/DocumentContext";
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { config } from "@gluestack-ui/config";
 
 const Tab = createBottomTabNavigator();
 
 function App(): JSX.Element {
     return (
-        <DocumentProvider>
-            <NavigationContainer>
-                <Tab.Navigator initialRouteName="FAR">
-                    <Tab.Screen name="FAR" component={CfrReferenceView} />
-                    <Tab.Screen name="AIM" component={AimReferenceView} />
-                </Tab.Navigator>
-            </NavigationContainer>
-        </DocumentProvider>
+        <GluestackUIProvider config={config}>
+            <DocumentProvider>
+                <NavigationContainer>
+                    <Tab.Navigator initialRouteName="FAR">
+                        <Tab.Screen name="FAR" component={CfrReferenceView} />
+                        <Tab.Screen name="AIM" component={AimReferenceView} />
+                    </Tab.Navigator>
+                </NavigationContainer>
+            </DocumentProvider>
+        </GluestackUIProvider>
     );
 }
 

@@ -1,36 +1,21 @@
 import React, { useState } from "react";
 import { SplitView } from "./SplitView";
 import { ReferenceContentViewContext } from "./ContentView";
-import { SectionListRenderItem, SectionListData } from "react-native";
-import { SdItem } from "./document/Item";
-import { SdItemGroup } from "./document/types";
+import { TocNavigator } from "./TocView";
+import { ContentView } from "./ContentView";
 
 type Props = {
     docid: string;
-    TocView: React.ComponentType;
-    ContentView: React.ComponentType;
-    TocItem: SectionListRenderItem<SdItem>;
-    TocSectionHeader: {
-        (info: {
-            section: SectionListData<SdItem, SdItemGroup>;
-        }): React.ReactElement | null;
-    };
 };
 
-export function ReferenceView({
-    docid,
-    TocView,
-    ContentView,
-    TocItem,
-    TocSectionHeader,
-}: Props) {
+export function ReferenceView({ docid }: Props) {
     const [index, setIndex] = useState(0);
 
     return (
         <ReferenceContentViewContext.Provider
-            value={{ docid, index, setIndex, TocItem, TocSectionHeader }}
+            value={{ docid, index, setIndex }}
         >
-            <SplitView Master={TocView} Detail={ContentView} />
+            <SplitView Master={TocNavigator} Detail={ContentView} />
         </ReferenceContentViewContext.Provider>
     );
 }

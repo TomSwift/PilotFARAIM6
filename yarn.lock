@@ -2157,6 +2157,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gluestack-ui/config@npm:latest":
+  version: 1.0.3
+  resolution: "@gluestack-ui/config@npm:1.0.3"
+  peerDependencies:
+    "@gluestack-style/react": ">=1.0"
+    "@gluestack-ui/themed": ">=1.0"
+  checksum: f0e17845e59a1be2ca80315d690b79ed9fad9e7d21decd75fae2ee4f32e6b67c1e7b72a117d2f473de66675365b5abd24349d61e9cb251acc277dcac5bccb1db
+  languageName: node
+  linkType: hard
+
 "@gluestack-ui/divider@npm:^0.1.8":
   version: 0.1.8
   resolution: "@gluestack-ui/divider@npm:0.1.8"
@@ -13637,6 +13647,7 @@ __metadata:
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
     "@gluestack-style/react": ^1.0.17
+    "@gluestack-ui/config": latest
     "@gluestack-ui/themed": ^1.0.17
     "@react-native-community/eslint-config": ^3.2.0
     "@react-navigation/bottom-tabs": ^6.5.7

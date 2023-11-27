@@ -1,8 +1,8 @@
 import { Document } from "../document/Document";
-import { SdItem } from "../document/types";
-import { CfrItem } from "./CfrItem";
+import { SdItem, SdItemGroup } from "../document/types";
+import { CfrItem, CfrItemType } from "./CfrItem";
 
-export class CfrDocument extends Document {
+export class CfrDocument extends Document<CfrItem> {
     protected readonly _tocItemTypes = [5, 6];
     protected readonly _pageTypes = [7, 8, 9];
     public static readonly docid = "FDFD560B-425F-4562-ABCE-673FF2E1E51D";
@@ -11,38 +11,31 @@ export class CfrDocument extends Document {
         super("cfr.sqlite", "cfr-template.html");
     }
 
-    protected item(item: SdItem) {
+    protected item(item: Partial<SdItem<CfrItemType>>) {
         return new CfrItem(item);
     }
 
-    public async itemForDocumentPage(page: number): Promise<SdItem> {
-        const item = await super.itemForDocumentPage(page);
-        item.description = function () {
-            var d = "";
-            const cfrTitle =
-                this.refid.match(/T_(?<title>[0-9]+)/)?.groups?.title;
-            if (cfrTitle) {
-                d += `${cfrTitle} CFR `;
+    public async tocForRoot(docItem?: CfrItem | undefined): Promise<any[]> {
+        const toc = await super.tocForRoot(docItem);
+
+        for (const group of toc) {
+            for (const item of group.children.filter(
+                (item: CfrItem) => item.type == CfrItemType.Subpart
+            )) {
+                const result = await this.db?.executeAsync(
+                    `SELECT MIN( CAST( tag AS INTEGER) ) AS l, MAX( CAST( tag AS INTEGER) ) AS h FROM sd_structure WHERE ( pid = ? ) AND ( type = 8 ) `,
+                    [item.rowid]
+                );
+                const l = result?.rows?.item(0)["l"];
+                const h = result?.rows?.item(0)["h"];
+                if (l < h) {
+                    item.subitemTitle = `§§ ${l}-${h}`;
+                } else if (l == h) {
+                    item.subitemTitle = `§ ${l}`;
+                }
             }
+        }
 
-            const cfrPart = this.refid.match(/P_(?<part>[0-9]+)/)?.groups?.part;
-            if (cfrPart) {
-                d += `Part ${cfrPart} `;
-            }
-
-            const cfrSection =
-                this.refid.match(/S_(?<section>[0-9]+)/)?.groups?.section;
-            if (cfrSection) {
-                d += `Section ${cfrSection} `;
-            }
-
-            if (cfrPart && cfrSection) {
-                d += `(${cfrPart}.${cfrSection})`;
-            }
-
-            return d;
-        };
-
-        return item;
+        return toc;
     }
 }

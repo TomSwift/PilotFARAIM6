@@ -1,6 +1,15 @@
 import { SdItem } from "../document/types";
 
-export class AimItem extends SdItem {
+export enum AimItemType {
+    Aim = 0,
+    Chapter = 1,
+    Section = 2,
+    Paragraph = 3,
+    Appendix = 4,
+    Callout = 10,
+}
+
+export class AimItem extends SdItem<AimItemType> {
     public description() {
         var d = "AIM ";
         const aimChapter =
@@ -21,5 +30,25 @@ export class AimItem extends SdItem {
             d += `${aimParagraph}`;
         }
         return d;
+    }
+
+    public tagTitle(): string {
+        switch (this.type) {
+            case AimItemType.Aim:
+                return "AIM";
+            case AimItemType.Chapter:
+                return "Chapter";
+            case AimItemType.Section:
+                return "Section";
+            case AimItemType.Paragraph:
+                return "Paragraph";
+            case AimItemType.Appendix:
+                return "Appendix";
+        }
+        return "";
+    }
+
+    public subitemsTitle(): string | null {
+        return null;
     }
 }

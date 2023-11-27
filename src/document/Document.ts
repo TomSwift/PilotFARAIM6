@@ -5,10 +5,10 @@ import {
 } from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
-import { SdItemContent, SdItemGroup, SdToc, XElement } from "./types";
+import { SdItemContent, SdItemGroup, XElement } from "./types";
 import { SdItem, SdItemType } from "./Item";
 
-export abstract class Document {
+export abstract class Document<Item extends SdItem<any>> {
     protected abstract readonly _tocItemTypes: Array<number>;
     protected abstract readonly _pageTypes: Array<number>;
     private _htmlTemplateName: string;
@@ -23,9 +23,9 @@ export abstract class Document {
         this._htmlTemplateName = htmlTemplateName;
     }
 
-    protected abstract item(item: Partial<SdItem>): SdItem;
+    protected abstract item(item: Partial<Item>): Item;
 
-    public async itemForDocumentPage(page: number): Promise<SdItem> {
+    public async itemForDocumentPage(page: number): Promise<Item> {
         const result = await this.db?.executeAsync(
             "SELECT rowid, * FROM sd_structure WHERE i = ? LIMIT 1",
             [page]
@@ -34,7 +34,7 @@ export abstract class Document {
         return this.item(result?.rows?.item(0));
     }
 
-    public async itemForDocumentRefid(refid: string): Promise<SdItem> {
+    public async itemForDocumentRefid(refid: string): Promise<Item> {
         const result = await this.db?.executeAsync(
             "SELECT rowid, * FROM sd_structure WHERE refid = ? LIMIT 1",
             [refid]
@@ -147,7 +147,7 @@ export abstract class Document {
         const parentTypes = Array.from(Array(rootType - 1).keys()).map(
             (x) => x + 1
         );
-        const toc: Array<any> = [];
+        const toc: Array<SdItemGroup<Item>> = [];
         const sectionHeaders: Record<number, any> = {};
 
         const pidsResult = await this.db?.executeAsync(
@@ -156,7 +156,7 @@ export abstract class Document {
         );
         pidsResult?.rows?._array.forEach(
             async (item: { pid: number; l: number; r: number }) => {
-                const sectionHeader: SdItemGroup = {
+                const sectionHeader: SdItemGroup<Item> = {
                     index: toc.length,
                     parents: {},
                     children: [],
@@ -173,7 +173,7 @@ export abstract class Document {
                     [item.l, item.r]
                 );
 
-                parentsResult?.rows?._array.forEach((parent: SdItem) => {
+                parentsResult?.rows?._array.forEach((parent: Item) => {
                     sectionHeader.parents[parent.type] = this.item(parent);
                 });
             }
@@ -183,15 +183,15 @@ export abstract class Document {
             "SELECT s.rowid, s.* FROM sd_structure s WHERE type = ? ORDER BY l",
             [rootType]
         );
-        partsResult?.rows?._array.forEach((part: SdItem) => {
+        partsResult?.rows?._array.forEach((part: Item) => {
             const sectionHeader = sectionHeaders[part.pid];
             sectionHeader.children.push(this.item(part));
         });
         return toc;
     }
 
-    public async parentsForDocItem(docItem: SdItem) {
-        const parents: Array<SdItem> = [];
+    public async parentsForDocItem(docItem: Item) {
+        const parents: Array<Item> = [];
 
         while (true) {
             const rs = await this.db?.executeAsync(
@@ -201,18 +201,18 @@ export abstract class Document {
             if (!rs?.rows?.length) {
                 return parents;
             } else {
-                docItem = rs.rows.item(0) as SdItem;
+                docItem = this.item(rs.rows.item(0));
                 parents.splice(0, 0, docItem);
             }
         }
     }
 
-    public async tocForRoot(docItem?: SdItem) {
+    public async tocForRoot(docItem?: Item): Promise<Array<SdItemGroup<Item>>> {
         if (!docItem) {
             return this.rootToc();
         }
 
-        const sectionHeader: SdItemGroup = {
+        const sectionHeader: SdItemGroup<Item> = {
             index: 0,
             parents: (await this.parentsForDocItem(docItem)).reduce(
                 (accumulator, p) => {
@@ -240,7 +240,7 @@ export abstract class Document {
             [docItem.rowid]
         );
 
-        rsChildren?.rows?._array.forEach((childItem: SdItem) => {
+        rsChildren?.rows?._array.forEach((childItem: Item) => {
             sectionHeader.children.push(
                 this.item({
                     ...childItem,

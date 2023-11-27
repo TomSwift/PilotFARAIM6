@@ -8,12 +8,14 @@ import {
 import { usePfaDocument } from "./document/usePfaDocument";
 import { SdItem, SdItemGroup } from "./document/types";
 import { ReferenceContentViewContext } from "./ContentView";
+import { TocItem } from "./TocItem";
+import { TocSectionHeader } from "./TocSectionHeader";
 
 export const TocStack = createStackNavigator<RootStackParamList>();
 
 type RootStackParamList = {
     Toc: {
-        rootItem?: SdItem;
+        rootItem?: SdItem<any>;
     };
 };
 
@@ -22,10 +24,7 @@ export type TocScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 type Props = StackScreenProps<RootStackParamList, "Toc">;
 
 export function TocView(props: Props) {
-    const { docid, TocItem, TocSectionHeader } = useContext(
-        ReferenceContentViewContext
-    );
-
+    const { docid } = useContext(ReferenceContentViewContext);
     const document = usePfaDocument(docid);
     const [sections, setSections] = useState<Array<any>>([]);
 
@@ -33,7 +32,7 @@ export function TocView(props: Props) {
         (async () => {
             const toc = await document.tocForRoot(props.route.params?.rootItem);
 
-            const ss = toc.map((itemGroup: SdItemGroup) => {
+            const ss = toc.map((itemGroup: SdItemGroup<unknown>) => {
                 return {
                     ...itemGroup,
                     data: [...(itemGroup.children ?? [])],
@@ -44,7 +43,7 @@ export function TocView(props: Props) {
     }, [props.route.params?.rootItem, document]);
 
     return (
-        <SectionList<SdItem, SdItemGroup>
+        <SectionList<SdItem<any>, SdItemGroup<any>>
             sections={sections}
             keyExtractor={(item) => item.rowid.toString()}
             renderItem={TocItem}

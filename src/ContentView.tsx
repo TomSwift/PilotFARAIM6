@@ -8,15 +8,13 @@ import React, {
 import {
     LayoutChangeEvent,
     LayoutRectangle,
-    SectionListData,
-    SectionListRenderItem,
     StyleSheet,
     Text,
     View,
     ViewToken,
     VirtualizedList,
 } from "react-native";
-import WebView from "react-native-webview";
+import WebView, { WebViewProps } from "react-native-webview";
 import { usePfaDocument } from "./document/usePfaDocument";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { SdItem, SdItemGroup } from "./document/types";
@@ -29,13 +27,13 @@ function Content({
     width,
 }: {
     docid: string;
-    document: Document;
+    document: Document<any>;
     index: number;
     width: number;
 }) {
     const r = useContext(ReferenceContentViewContext);
 
-    const [pageItem, setPageItem] = useState<SdItem>();
+    const [pageItem, setPageItem] = useState<SdItem<never>>();
 
     const shouldStartLoadWithRequest = useCallback(
         (event: ShouldStartLoadRequest) => {
@@ -47,7 +45,7 @@ function Content({
                     console.log(result.refid);
                     document
                         .itemForDocumentRefid(result.refid)
-                        .then((item: SdItem) => {
+                        .then((item: SdItem<never>) => {
                             r?.setIndex(item.i);
                         });
                 }
@@ -59,10 +57,12 @@ function Content({
     );
 
     useEffect(() => {
-        document.itemForDocumentPage(index).then((item: SdItem) => {
+        document.itemForDocumentPage(index).then((item: SdItem<never>) => {
             setPageItem(item);
         });
     }, [index]);
+
+    const webViewRef = useRef<WebView | null>(null);
 
     return (
         <View style={{ flexDirection: "column" }}>
@@ -83,6 +83,8 @@ function Content({
                 webviewDebuggingEnabled={true}
                 originWhitelist={["*"]}
                 onShouldStartLoadWithRequest={shouldStartLoadWithRequest}
+                ref={webViewRef}
+                onContentProcessDidTerminate={webViewRef.current?.reload}
             />
         </View>
     );
@@ -92,20 +94,12 @@ type ReferenceContent = {
     docid: string;
     index: number;
     setIndex: (i: number) => void;
-    TocItem: SectionListRenderItem<SdItem>;
-    TocSectionHeader: {
-        (info: {
-            section: SectionListData<SdItem, SdItemGroup>;
-        }): React.ReactElement | null;
-    };
 };
 export const ReferenceContentViewContext =
     React.createContext<ReferenceContent>({
         docid: "",
         index: 0,
         setIndex: () => {},
-        TocItem: () => null,
-        TocSectionHeader: () => null,
     });
 
 export function ContentView() {
@@ -162,7 +156,7 @@ export function ContentView() {
                     console.log(result.refid);
                     document
                         .itemForDocumentRefid(result.refid)
-                        .then((item: SdItem) => {
+                        .then((item: SdItem<never>) => {
                             r?.setIndex(item.i);
                         });
                 }

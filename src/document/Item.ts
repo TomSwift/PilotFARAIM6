@@ -5,11 +5,11 @@ export enum SdItemType {
     Table = 103,
 }
 
-export abstract class SdItem {
+export abstract class SdItem<P> {
     public rowid!: number;
     public pid!: number;
     public refid!: string;
-    public type!: SdItemType | number;
+    public type!: P | SdItemType | number;
     public tag!: string | null;
     public title!: string | null;
     public l!: number;
@@ -17,9 +17,11 @@ export abstract class SdItem {
     public p!: number;
     public i!: number;
     public content!: string | null;
+    public subitemTitle?: string;
     public isPageItem?: true;
-    public constructor(item: Partial<SdItem>) {
+    public constructor(item: Partial<SdItem<P>>) {
         Object.assign(this, item);
     }
     public abstract description(): string;
+    public abstract tagTitle(): string;
 }

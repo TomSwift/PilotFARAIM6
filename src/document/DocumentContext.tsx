@@ -7,7 +7,6 @@ import {
     SdItemContent,
     SdItemGroup,
     SdItemType,
-    SdToc,
     XElement,
 } from "./types";
 import { CfrDocument } from "../cfr/CfrDocument";
@@ -16,7 +15,7 @@ import { AimDocument } from "../aim/AimDocument";
 import { BridgeServer } from "react-native-http-bridge-refurbished";
 
 export const DocumentContext = React.createContext<{
-    documents: Record<string, Document>;
+    documents: Record<string, Document<any>>;
 }>({ documents: {} });
 
 interface Asset {
@@ -29,7 +28,7 @@ export function DocumentProvider({
 }: {
     children: React.ReactElement;
 }) {
-    const documents = React.useMemo<Record<string, Document>>(
+    const documents = React.useMemo<Record<string, Document<any>>>(
         () => ({
             [CfrDocument.docid]: new CfrDocument(),
             [AimDocument.docid]: new AimDocument(),
@@ -39,7 +38,7 @@ export function DocumentProvider({
 
     React.useEffect(() => {
         return () => {
-            Object.values(documents).forEach((document: Document) =>
+            Object.values(documents).forEach((document: Document<any>) =>
                 document.db.close()
             );
         };

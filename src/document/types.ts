@@ -9,14 +9,12 @@ export type XElement = {
     r: number;
 };
 
-export type SdItemContent = Omit<SdItem, "l" | "p" | "i" | "pid"> & {
+export type SdItemContent = Omit<SdItem<never>, "l" | "p" | "i" | "pid"> & {
     content: string | null;
 };
 
-export type SdItemGroup = {
+export type SdItemGroup<Item> = {
     index: number;
-    parents: Record<number, SdItem>;
-    children: Array<SdItem>;
+    parents: Record<number, Item>;
+    children: Array<Item>;
 };
-
-export type SdToc = Array<SdItemGroup>;
