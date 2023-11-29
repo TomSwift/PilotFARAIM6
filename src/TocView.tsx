@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useState,
+} from "react";
 import { SectionList } from "react-native";
 import {
     StackNavigationProp,
@@ -7,9 +13,11 @@ import {
 } from "@react-navigation/stack";
 import { usePfaDocument } from "./document/usePfaDocument";
 import { SdItem, SdItemGroup } from "./document/types";
-import { ReferenceContentViewContext } from "./ContentView";
+import { ReferenceContentViewContext } from "./ReferenceView";
 import { TocItem } from "./TocItem";
 import { TocSectionHeader } from "./TocSectionHeader";
+import { Divider } from "@gluestack-ui/themed";
+import { useNavigation } from "@react-navigation/native";
 
 export const TocStack = createStackNavigator<RootStackParamList>();
 
@@ -28,7 +36,7 @@ export function TocView(props: Props) {
     const document = usePfaDocument(docid);
     const [sections, setSections] = useState<Array<any>>([]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         (async () => {
             const toc = await document.tocForRoot(props.route.params?.rootItem);
 
@@ -42,12 +50,38 @@ export function TocView(props: Props) {
         })();
     }, [props.route.params?.rootItem, document]);
 
+    const { push } = useNavigation<TocScreenNavigationProp>();
+    const { setIndex } = useContext(ReferenceContentViewContext);
+    const onPress = useCallback(
+        (item: SdItem<any>) => {
+            if (item.isPageItem) {
+                setIndex(item.i);
+            } else {
+                push("Toc", { rootItem: item });
+            }
+        },
+        [push, setIndex]
+    );
+
+    const keyExtractor = useCallback(
+        (item: SdItem<any>) => item.rowid.toString(),
+        []
+    );
+
+    const renderItem = useCallback(
+        ({ item }: { item: SdItem<any> }) => (
+            <TocItem item={item} onPress={onPress} />
+        ),
+        []
+    );
+
     return (
         <SectionList<SdItem<any>, SdItemGroup<any>>
             sections={sections}
-            keyExtractor={(item) => item.rowid.toString()}
-            renderItem={TocItem}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
             renderSectionHeader={TocSectionHeader}
+            ItemSeparatorComponent={Divider}
         />
     );
 }

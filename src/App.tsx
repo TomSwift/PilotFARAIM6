@@ -23,7 +23,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { CfrReferenceView } from "./cfr/CfrReferenceView";
 import { AimReferenceView } from "./aim/AimReferenceView";
-import { DocumentContext, DocumentProvider } from "./document/DocumentContext";
+import { DocumentProvider } from "./document/DocumentContext";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 

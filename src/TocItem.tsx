@@ -2,9 +2,6 @@ import React, { useCallback, useContext } from "react";
 import { View, Pressable } from "react-native";
 import { SdItem } from "./document/types";
 import { toTitleCase } from "titlecase";
-import { useNavigation } from "@react-navigation/native";
-import { ReferenceContentViewContext } from "./ContentView";
-import { TocScreenNavigationProp } from "./TocView";
 
 import {
     Box,
@@ -17,19 +14,15 @@ import {
     ChevronRightIcon,
 } from "@gluestack-ui/themed";
 
-export function TocItem({ item }: { item: SdItem<any> }) {
-    const n = useNavigation<TocScreenNavigationProp>();
-    const r = useContext(ReferenceContentViewContext);
-    const onPress = useCallback(() => {
-        if (item.isPageItem) {
-            r?.setIndex(item.i);
-        } else {
-            n.push("Toc", { rootItem: item });
-        }
-    }, [n, item, r]);
-
+function _TocItem({
+    item,
+    onPress,
+}: {
+    item: SdItem<any>;
+    onPress: (item: SdItem<any>) => void;
+}) {
     return (
-        <Pressable onPress={onPress}>
+        <Pressable onPress={() => onPress(item)}>
             <HStack>
                 <Box
                     width={65}
@@ -63,7 +56,6 @@ export function TocItem({ item }: { item: SdItem<any> }) {
                     </Box>
                 )}
             </HStack>
-            <Divider />
             {item.subitemTitle && (
                 <Text
                     size="xs"
@@ -76,3 +68,4 @@ export function TocItem({ item }: { item: SdItem<any> }) {
         </Pressable>
     );
 }
+export const TocItem = React.memo(_TocItem);

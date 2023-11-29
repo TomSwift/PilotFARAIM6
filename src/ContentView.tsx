@@ -19,6 +19,7 @@ import { usePfaDocument } from "./document/usePfaDocument";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { SdItem, SdItemGroup } from "./document/types";
 import { Document } from "./document/Document";
+import { ReferenceContentViewContext } from "./ReferenceView";
 
 function Content({
     docid,
@@ -31,7 +32,7 @@ function Content({
     index: number;
     width: number;
 }) {
-    const r = useContext(ReferenceContentViewContext);
+    const { setIndex } = useContext(ReferenceContentViewContext);
 
     const [pageItem, setPageItem] = useState<SdItem<never>>();
 
@@ -46,7 +47,7 @@ function Content({
                     document
                         .itemForDocumentRefid(result.refid)
                         .then((item: SdItem<never>) => {
-                            r?.setIndex(item.i);
+                            setIndex(item.i);
                         });
                 }
                 return false;
@@ -90,18 +91,6 @@ function Content({
     );
 }
 
-type ReferenceContent = {
-    docid: string;
-    index: number;
-    setIndex: (i: number) => void;
-};
-export const ReferenceContentViewContext =
-    React.createContext<ReferenceContent>({
-        docid: "",
-        index: 0,
-        setIndex: () => {},
-    });
-
 export function ContentView() {
     const [layoutRectangle, setLayoutRectangle] = useState<LayoutRectangle>({
         x: 0,
@@ -118,7 +107,7 @@ export function ContentView() {
     const [pageCount, setPageCount] = useState(0);
     const document = usePfaDocument(docid);
 
-    const r = useContext(ReferenceContentViewContext);
+    const { index, setIndex } = useContext(ReferenceContentViewContext);
 
     const listRef = useRef<VirtualizedList<number>>(null);
 
@@ -134,38 +123,17 @@ export function ContentView() {
             changed: Array<ViewToken>;
         }) => {
             if (info.viewableItems?.length > 0) {
-                r?.setIndex(info.viewableItems[0].index || 0);
+                setIndex(info.viewableItems[0].index || 0);
             }
         },
-        [r]
+        [setIndex]
     );
 
     useEffect(() => {
         if (pageCount > 0) {
-            listRef?.current?.scrollToIndex({ index: r?.index || 0 });
+            listRef?.current?.scrollToIndex({ index: index || 0 });
         }
-    }, [r, pageCount]);
-
-    const shouldStartLoadWithRequest = useCallback(
-        (event: ShouldStartLoadRequest) => {
-            console.log(`shouldStart: ${event.url}`);
-            if (event.url.startsWith("pfa:")) {
-                const [_, __, docid, refid] = event.url.split("/");
-                const result = document.splitContentRefid(refid);
-                if (result) {
-                    console.log(result.refid);
-                    document
-                        .itemForDocumentRefid(result.refid)
-                        .then((item: SdItem<never>) => {
-                            r?.setIndex(item.i);
-                        });
-                }
-                return false;
-            }
-            return true;
-        },
-        [document]
-    );
+    }, [index, pageCount]);
 
     return (
         <View style={StyleSheet.absoluteFill} onLayout={onLayout}>
