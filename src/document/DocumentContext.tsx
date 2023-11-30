@@ -1,5 +1,4 @@
 import * as React from "react";
-import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
 import {
@@ -91,7 +90,18 @@ export function DocumentProvider({
                 console.log(`request for: ${req.url}`);
                 const [_, docid, file] = req.url.split("/");
                 const document = documents[docid];
-                if (/[0-9+]/.test(file)) {
+                if (/FIG_/.test(file) && document) {
+                    const resource = await document.resourceWithName(file);
+                    if (resource) {
+                        return res.send(
+                            200,
+                            resource.mime_type,
+                            resource.resource
+                        );
+                    } else {
+                        return res.send(404, "", "");
+                    }
+                } else if (/[0-9+]/.test(file)) {
                     if (document) {
                         return res.send(
                             200,

@@ -3675,6 +3675,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@op-engineering/op-sqlite@npm:^1.0.14":
+  version: 1.0.14
+  resolution: "@op-engineering/op-sqlite@npm:1.0.14"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: b1ac7b3a79ac2652dac8bbe17c06afecc40b19e3fda41e11aaf910c5752032eb7eb4089fd20dbcb9f6808e74213ea54a124f6c8b9e7cd9fe9b5c2bcb46767007
+  languageName: node
+  linkType: hard
+
 "@pnpm/config.env-replace@npm:^1.1.0":
   version: 1.1.0
   resolution: "@pnpm/config.env-replace@npm:1.1.0"
@@ -13435,6 +13445,7 @@ __metadata:
     "@gluestack-style/react": ^1.0.17
     "@gluestack-ui/config": latest
     "@gluestack-ui/themed": ^1.0.17
+    "@op-engineering/op-sqlite": ^1.0.14
     "@react-native-community/eslint-config": ^3.2.0
     "@react-navigation/bottom-tabs": ^6.5.7
     "@react-navigation/native": ^6.1.6
@@ -13457,7 +13468,6 @@ __metadata:
     react-native-gesture-handler: ^2.9.0
     react-native-http-bridge-refurbished: "workspace:^"
     react-native-local-resource: ^0.1.6
-    react-native-quick-sqlite: ^8.0.2
     react-native-safe-area-context: ^4.5.1
     react-native-screens: ^3.20.0
     react-native-svg: 13.4.0
@@ -13920,6 +13930,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-http-bridge-refurbished@workspace:packages/react-native-http-bridge-refurbished"
   dependencies:
+    base64-js: ^1.5.1
     react-native: ^0.72.7
     semantic-release: ^21.0.1
   languageName: unknown
@@ -13931,16 +13942,6 @@ __metadata:
   peerDependencies:
     react-native: ^0.41.2
   checksum: 44204bd0a53d20d105e32474b560ee836650fdc551ae32ca31a80aa239b09d3c882becb4e0d3f6e6233f157b21c984897b1f294f72ed4d480a13107124e1d589
-  languageName: node
-  linkType: hard
-
-"react-native-quick-sqlite@npm:^8.0.2":
-  version: 8.0.2
-  resolution: "react-native-quick-sqlite@npm:8.0.2"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 1f7e05c0103191732b103d3d4a2aa9f9a6facfc868ecdf79dca855483f3f6c2719ceec56575c2c81ad3ef1c0ede6f29da1def1c968d48504deae45670b17eb47
   languageName: node
   linkType: hard
 

@@ -20,17 +20,21 @@ export class CfrDocument extends Document<CfrItem> {
 
         for (const group of toc) {
             for (const item of group.children.filter(
-                (item: CfrItem) => item.type == CfrItemType.Subpart
+                (item: CfrItem) =>
+                    item.type == CfrItemType.Subpart ||
+                    item.type == CfrItemType.Part
             )) {
                 const result = await this.db?.executeAsync(
-                    `SELECT MIN( CAST( tag AS INTEGER) ) AS l, MAX( CAST( tag AS INTEGER) ) AS h FROM sd_structure WHERE ( pid = ? ) AND ( type = 8 ) `,
-                    [item.rowid]
+                    // `SELECT MIN( CAST( tag AS INTEGER) ) AS l, MAX( CAST( tag AS INTEGER) ) AS h FROM sd_structure WHERE ( pid = ? ) AND ( type = 8 ) `,
+                    `SELECT MIN( CAST( tag AS INTEGER) ) AS low, MAX( CAST( tag AS INTEGER) ) AS high FROM sd_structure s WHERE ( s.l BETWEEN ? AND ? ) AND ( type = 8 ) `,
+                    [item.l, item.r]
+                    // [item.rowid]
                 );
-                const l = result?.rows?.item(0)["l"];
-                const h = result?.rows?.item(0)["h"];
+                const l = result?.rows?.item(0)["low"];
+                const h = result?.rows?.item(0)["high"];
                 if (l < h) {
                     item.subitemTitle = `§§ ${l}-${h}`;
-                } else if (l == h) {
+                } else if (l && l == h) {
                     item.subitemTitle = `§ ${l}`;
                 }
             }

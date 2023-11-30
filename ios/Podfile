@@ -70,11 +70,12 @@ target 'PilotFARAIM6' do
  
     # turn on SQLITE FTS3
     installer.pods_project.targets.each do |target|
-      if target.name == "react-native-quick-sqlite" then
+      if target.name == "op-sqlite" then
         target.build_configurations.each do |config|
           config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'SQLITE_ENABLE_FTS3', 'SQLITE_ENABLE_FTS3_PARENTHESIS', 'SQLITE_ENABLE_MEMORY_MANAGEMENT']
         end
       end
+  
     end
  
   end 

@@ -1,8 +1,4 @@
-import {
-    QuickSQLite,
-    QuickSQLiteConnection,
-    open,
-} from "react-native-quick-sqlite";
+import { open, OPSQLiteConnection } from "@op-engineering/op-sqlite";
 import loadLocalRawResource from "react-native-local-resource";
 import { htmlForElement } from "./htmlForElement";
 import { SdItemContent, SdItemGroup, XElement } from "./types";
@@ -16,7 +12,7 @@ export abstract class Document<Item extends SdItem<any>> {
 
     public static readonly docid: string;
 
-    public readonly db: QuickSQLiteConnection;
+    public readonly db: OPSQLiteConnection;
 
     constructor(dbName: string, htmlTemplateName: string) {
         this.db = open({ name: dbName });
@@ -115,9 +111,11 @@ export abstract class Document<Item extends SdItem<any>> {
             );
         }
 
-        const html =
+        // TODO: maybe find a better way to fixup the pa:// URLs
+        const html = (
             this._htmlTemplate?.replace(/\{CONTENT\}/, htmlForElement(root)) ||
-            "";
+            ""
+        ).replace(/pa:\/\/([A-Z0-9\-]+\/)/g, "");
 
         // console.log(root);
         return html;
@@ -131,6 +129,29 @@ export abstract class Document<Item extends SdItem<any>> {
     public async htmlForDocumentRefid(refid: string): Promise<string> {
         const { l, r } = await this.itemForDocumentRefid(refid);
         return this.html(l, r);
+    }
+
+    public async resourceWithName(
+        name: string
+    ): Promise<{ resource: ArrayBuffer; mime_type: string } | null> {
+        const result = this.db?.execute(
+            "SELECT resource, mime_type FROM sd_resources WHERE resource_name = ? LIMIT 1",
+            [name]
+        );
+        const resource = result?.rows?.item(0)["resource"];
+        var mime_type = result?.rows?.item(0)["mime_type"];
+        if (mime_type === null) {
+            if (name.includes("jpg") || name.includes("jpeg")) {
+                mime_type = "image/jpeg";
+            } else if (name.includes("png")) {
+                mime_type = "image/png";
+            } else if (name.includes("bmp")) {
+                mime_type = "image/bmp";
+            } else {
+                mime_type = "image";
+            }
+        }
+        return { resource, mime_type } || null;
     }
 
     public async documentPageCount(_: /*docid*/ string): Promise<number> {
@@ -241,12 +262,7 @@ export abstract class Document<Item extends SdItem<any>> {
         );
 
         rsChildren?.rows?._array.forEach((childItem: Item) => {
-            sectionHeader.children.push(
-                this.item({
-                    ...childItem,
-                    isPageItem: childItem.i !== null ? true : undefined,
-                })
-            );
+            sectionHeader.children.push(this.item(childItem));
         });
 
         return [sectionHeader];

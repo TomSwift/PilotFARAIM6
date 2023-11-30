@@ -25,7 +25,7 @@ function _TocItem({
         <Pressable onPress={() => onPress(item)}>
             <HStack>
                 <Box
-                    width={65}
+                    width={85}
                     minHeight={65}
                     padding={"$2"}
                     justifyContent="center"
@@ -42,6 +42,15 @@ function _TocItem({
                             >
                                 {item.tag}
                             </Text>
+                            {item.subitemTitle && (
+                                <Text
+                                    size="xs"
+                                    textAlign="left"
+                                    adjustsFontSizeToFit={true}
+                                >
+                                    {item.subitemTitle}
+                                </Text>
+                            )}
                         </Center>
                     </VStack>
                 </Box>
@@ -56,15 +65,6 @@ function _TocItem({
                     </Box>
                 )}
             </HStack>
-            {item.subitemTitle && (
-                <Text
-                    size="xs"
-                    textAlign="right"
-                    sx={{ position: "absolute", right: "$2", bottom: "$1" }}
-                >
-                    {item.subitemTitle}
-                </Text>
-            )}
         </Pressable>
     );
 }
